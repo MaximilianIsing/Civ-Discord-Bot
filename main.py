@@ -8,8 +8,6 @@ import os
 
 Token = os.getenv("DISCORD_TOKEN")
 
-if not TOKEN:
-    raise ValueError("No DISCORD_TOKEN found in environment variables.")
 
 
 intents = discord.Intents.default()
