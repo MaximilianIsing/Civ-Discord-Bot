@@ -5,7 +5,12 @@ import time
 import asyncio
 import random
 
-Token = "MTM1MTk4NTM2MzYwOTk3Njg1Mw.G85Z1L.IU2YCHGfepqzuXq_BI1gO84N-4BJFAebjkZtOc"
+Token = os.getenv("DISCORD_TOKEN")
+
+if not TOKEN:
+    raise ValueError("No DISCORD_TOKEN found in environment variables.")
+
+
 intents = discord.Intents.default()
 intents.message_content = True
 OwnerID = 424980696264867880
