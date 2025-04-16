@@ -4,9 +4,12 @@ from discord.ext import commands
 import time
 import asyncio
 import random
-import os
 
-Token = os.getenv("DISCORD_TOKEN")
+with open("TOKEN.txt", "r") as file:
+    content = file.read()
+
+Token = content
+
 
 
 
