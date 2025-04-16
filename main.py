@@ -268,8 +268,6 @@ async def vote(ctx):
         for reaction in crisisEmojis:
             await crisisMessage.add_reaction(reaction)
 
-
-
         civEmojis = []
         for civ in allCivs:
             civEmojis.append(discord.utils.get(ctx.guild.emojis, name=civ))
@@ -347,27 +345,24 @@ async def vote(ctx):
             crisisMessage.id,
             civMessage.id,
             numLeaderMessage.id,
+            firstLeaderMessage.id,
+            secondLeaderMessage.id
         ]
 
         allReactions = await fetchAndFormatReactions(ctx,messageIDs,playerIDs)
 
-        mapReactions, startReactions, crisisReactions, civReactions, numLeaderReactions = allReactions
+        mapReactions, startReactions, crisisReactions, civReactions, numLeaderReactions, firstLeaderReactions, secondLeaderReactions = allReactions
 
 
         await asyncio.sleep(0.5)
 
-        finalFirstLeaderMessage = await ctx.fetch_message(firstLeaderMessage.id)
-        finalSecondLeaderMessage = await ctx.fetch_message(secondLeaderMessage.id)
-        leaderReactions = await formatReactions(
-            finalFirstLeaderMessage.reactions + finalSecondLeaderMessage.reactions,
-            playerIDs
-        )
+
+        leaderReactions = firstLeaderReactions + secondLeaderReactions
+
 
         if len(playerIDs) <= 4:
             finalNumCivMessage = await ctx.fetch_message(numCivMessage.id)
             numCivReactions = await formatReactions(finalNumCivMessage.reactions,playerIDs)
-
-
 
 
         chosenMapIndex = getPick(mapReactions,1,False)[0]
