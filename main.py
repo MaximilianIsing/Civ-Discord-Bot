@@ -15,6 +15,7 @@ intents.message_content = True
 OwnerID = 424980696264867880
 bot = commands.Bot(command_prefix="/", intents=intents)
 
+doneVotingCheck = 2 # Num of seconds between checks
 
 allCivs = [
         "Aksum",
@@ -96,6 +97,18 @@ numLeaderOptions = ["1️⃣", "2️⃣", "3️⃣", "4️⃣"]
 
 numCivOptions =  ["1️⃣", "2️⃣"]
 
+mostRecentCivOptions = []
+mostRecentLeaderOptions = []
+mostRecentPlayers = []
+
+gameHasOccured = False
+
+civEmojis = []
+leaderEmojis = []
+civEmojiIDs = [None] * len(allCivs)
+leaderEmojiIDs = [None] * len(allLeaders)
+
+
 
 def replaceUnderscores(input):
     return input.replace("_", " ")
@@ -103,6 +116,17 @@ def replaceUnderscores(input):
 
 @bot.event
 async def on_ready():
+    for civ in allCivs:
+        civEmojis.append(discord.utils.get(ctx.guild.emojis, name=civ))
+    for leader in allLeaders:
+        leaderEmojis.append(discord.utils.get(ctx.guild.emojis, name=leader))
+
+    for i in range(len(civEmojiIDs)):
+            civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
+
+    for i in range(len(leaderEmojiIDs)):
+        leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
+
     print("Bot Ready")
 
 
@@ -212,7 +236,6 @@ def getPick(countList, n, nonePossible):
 async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
     # Fetch messages concurrently
     messages = await asyncio.gather(*[ctx.fetch_message(msg_id) for msg_id in message_ids])
-    await asyncio.sleep(1)
     # Format reactions concurrently for each message
     reactions = await asyncio.gather(*[
         formatReactions(message.reactions, playerIDs) for message in messages
@@ -268,19 +291,11 @@ async def vote(ctx):
         for reaction in crisisEmojis:
             await crisisMessage.add_reaction(reaction)
 
-        civEmojis = []
-        for civ in allCivs:
-            civEmojis.append(discord.utils.get(ctx.guild.emojis, name=civ))
-
         civMessage = await ctx.send("Civ Bans: (3 bans max)")
         for reaction in civEmojis:
             await civMessage.add_reaction(reaction)
 
         # Leader Bans
-        leaderEmojis = []
-        for leader in allLeaders:
-            leaderEmojis.append(discord.utils.get(ctx.guild.emojis, name=leader))
-
         firstLeaderMessage = await ctx.send("Leader Bans: (5 bans max)")
         for r in range(20):
             await firstLeaderMessage.add_reaction(leaderEmojis[r])
@@ -300,7 +315,6 @@ async def vote(ctx):
             for reaction in numCivOptions:
                 await numCivMessage.add_reaction(reaction)
 
-
         finishedMessage = await ctx.send("Done Voting?")
         await finishedMessage.add_reaction("➕")
 
@@ -314,7 +328,7 @@ async def vote(ctx):
         remainingMessage = await ctx.send(output)
 
         while not allFinished:
-            await asyncio.sleep(2)
+            await asyncio.sleep(doneVotingCheck)
 
             hasChanged = False
 
@@ -353,10 +367,6 @@ async def vote(ctx):
 
         mapReactions, startReactions, crisisReactions, civReactions, numLeaderReactions, firstLeaderReactions, secondLeaderReactions = allReactions
 
-
-        await asyncio.sleep(0.5)
-
-
         leaderReactions = firstLeaderReactions + secondLeaderReactions
 
 
@@ -383,15 +393,6 @@ async def vote(ctx):
             await ctx.send("Crisis Disabled - 🚫")
         else:
             await ctx.send("Crisis Enabled - ✅")
-
-        civEmojiIDs = [None] * len(allCivs)
-        leaderEmojiIDs = [None] * len(allLeaders)
-
-        for i in range(len(civEmojiIDs)):
-            civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
-
-        for i in range(len(leaderEmojiIDs)):
-            leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
 
         bannedCivs = getPick(civReactions,3,True)
         if len(bannedCivs) > 0:
@@ -429,7 +430,11 @@ async def vote(ctx):
         civOptions = getPick(numCivReactions,1,False)[0] + 1
         if len(playerIDs) > 4:
             civOptions = 1
-
+        
+        gameHasOccured = True
+        mostRecentCivOptions = postBanCivs.copy()
+        mostRecentLeaderOptions = postBanLeaders.copy()
+        mostRecentPlayers = playerIDs.copy()
 
         for player in playerIDs:
             output = f"<@{player}>\n"
@@ -447,6 +452,27 @@ async def vote(ctx):
             await ctx.send(output + "\n")
     else:
         await ctx.send(f"Please use <#{lobbyHostingChannel}> for this command")
+
+
+async def reRoll(ctx):
+    tempCivs = mostRecentCivOptions.copy()
+    tempLeaders = mostRecentLeaderOptions.copy()
+
+    for player in mostRecentPlayers:
+            output = f"<@{player}>\n"
+
+            output += "__Civ Options:__\n"
+            for c in range(tempCivs):
+                thisCiv = tempCivs.pop()
+                output += f"{civEmojiIDs[thisCiv]} - {replaceUnderscores(allCivs[thisCiv])}\n"
+
+            output += "__Leader Options:__\n"
+            for l in range(tempLeaders):
+                thisLeader = tempLeaders.pop()
+                output += f"{leaderEmojiIDs[thisLeader]} - {replaceUnderscores(allLeaders[thisLeader])}\n"
+
+            await ctx.send(output + "\n")
+
 
 
 bot.run(Token)
