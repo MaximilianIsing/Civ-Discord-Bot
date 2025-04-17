@@ -111,7 +111,7 @@ leaderEmojis = []
 civEmojiIDs = [None] * len(allCivs)
 leaderEmojiIDs = [None] * len(allLeaders)
 
-guild = bot.get_guild(YOUR_GUILD_ID)
+guild = bot.get_guild(1351787046720503808)
 
 def replaceUnderscores(input):
     return input.replace("_", " ")
