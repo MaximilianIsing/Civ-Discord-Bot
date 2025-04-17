@@ -274,8 +274,8 @@ async def reroll(ctx):
 
     if gameHasOccured:
         print("Rerolling")
-        tempCivs = mostRecentCivOptions.copy()
-        tempLeaders = mostRecentLeaderOptions.copy()
+        tempCivs = random.shuffle(mostRecentCivOptions.copy())
+        tempLeaders = random.shuffle(mostRecentLeaderOptions.copy())
 
         for player in mostRecentPlayers:
                 output = f"<@{player}>\n"
@@ -516,9 +516,7 @@ async def vote(ctx):
         
         gameHasOccured = True
         mostRecentCivOptions = postBanCivs.copy()
-        mostRecentCivOptions = random.shuffle(mostRecentCivOptions)
         mostRecentLeaderOptions = postBanLeaders.copy()
-        mostRecentLeaderOptions = random.shuffle(mostRecentLeaderOptions)
         mostRecentPlayers = playerIDs.copy()
         mustRecentNumLeaders = leaderOptions
         mostRecentNumCivs = civOptions
