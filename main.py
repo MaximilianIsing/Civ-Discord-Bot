@@ -107,6 +107,8 @@ mostRecentNumCivs = 0
 
 gameHasOccured = False
 
+hasSynced = False
+
 civEmojis = []
 leaderEmojis = []
 civEmojiIDs = [None] * len(allCivs)
@@ -130,7 +132,10 @@ async def on_message(message):
 
 @bot.command(name="sync")
 async def sync(ctx):
+    global hasSynced
+
     if ctx.author.id == OwnerID:
+        hasSynced = True
         await bot.tree.sync()
 
         for civ in allCivs:
@@ -289,6 +294,9 @@ async def reroll(ctx):
 
 @bot.command(name="vote", description="Starts lobby vote")
 async def vote(ctx):
+    global hasSynced
+    if not hasSynced:
+        await sync(ctx)
     lobbyHostingChannel = 1351993272096260127
     if ctx.channel.id == lobbyHostingChannel:  # In lobby_hosting channel
         voiceChannel = discord.utils.get(ctx.guild.voice_channels, name="Game Lobby")
