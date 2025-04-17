@@ -130,8 +130,10 @@ async def on_message(message):
 async def sync(ctx):
     if ctx.author.id == OwnerID:
         await bot.tree.sync()
+
         for civ in allCivs:
             civEmojis.append(discord.utils.get(ctx.guild.emojis, name=civ))
+
         for leader in allLeaders:
             leaderEmojis.append(discord.utils.get(ctx.guild.emojis, name=leader))
 
@@ -140,6 +142,7 @@ async def sync(ctx):
 
         for i in range(len(leaderEmojiIDs)):
             leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
+            
         await ctx.send("Synced")
     else:
         await ctx.send("Insufficient permissions")
@@ -268,7 +271,7 @@ async def vote(ctx, admin = False):
         excludedPlayers = decipherIDs(messageContent)
 
         hasExcluded = False
-        if len(excludedPlayer) > 0:
+        if len(excludedPlayers) > 0:
             for player in excludedPlayers:
                 if player in playerIDs:
                     playerIDs.remove(player)
