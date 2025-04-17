@@ -93,6 +93,16 @@ mapInfoLinks = {
         "Terra_Incognita":"https://oyster.ignimgs.com/mediawiki/apis.ign.com/civilization-7/5/52/Terra-standard.jpg?width=2240"
 }
 
+mapFavoring = {
+        "Continents": "Heavy land favored",
+        "Continents_Plus": "Slightly land favored",
+        "Archipelago": "Heavily naval favored",
+        "Fractal": "Naval favored",
+        "Shuffle=": "Land favored",
+        "Terra_Incognita": "Slightly land favored"
+
+}
+
 mapEmojis = ["🇨", "🇵", "🇦", "🇫", "🇸", "🇹"]
 
 
@@ -284,7 +294,7 @@ def decipherIDs(message):
 
 @bot.command(name="maplist", description="Lists all maps")
 async def maplist(ctx):
-    output = "Map Options Are:\n"
+    output = "__Map Options Are:__\n"
     for map in allMaps:
         output += map + "\n"
     await ctx.send(output)
@@ -294,15 +304,16 @@ async def mapinfo(ctx, map):
     messageContent = ctx.message.content
     if map in allMaps:
         mapEmbed = discord.Embed(
-            title = f"{map} Image",
-            description = f"Example of {map} generation",
+            title = replaceUnderscores(map),
+            description = mapinfoList[map] + "\n" + mapFavoring[map],
+            color = discord.Color.blue()
         )
         mapEmbed.set_image(url=mapInfoLinks[map])
 
         await ctx.send(mapInfoList[map])
-        await ctx.send(embed = )
+        await ctx.send(embed = mapEmbed)
     else: 
-        await ctx.send(f"{map} isn't an option, use /mapinfo for a list of options (use exact formatting)")
+        await ctx.send(f"{map} isn't an option, use /maplist for a list of options (use exact formatting)")
 
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
