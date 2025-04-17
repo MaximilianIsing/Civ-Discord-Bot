@@ -250,6 +250,7 @@ async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
 
 @bot.command(name="admin_vote", description = "Admin vote start")
 async def admin_vote(ctx):
+    global adminByPass
     if ctx.author.id == OwnerID:
         adminByPass = True
         await vote(ctx)
@@ -289,6 +290,7 @@ async def reroll(ctx):
 @bot.command(name="vote", description="Starts lobby vote")
 async def vote(ctx):
     lobbyHostingChannel = 1351993272096260127
+    global adminByPass
     if ctx.channel.id == lobbyHostingChannel:  # In lobby_hosting channel
         voiceChannel = discord.utils.get(ctx.guild.voice_channels, name="Game Lobby")
         playerIDs = [member.id for member in voiceChannel.members]
