@@ -272,9 +272,10 @@ async def maplist(ctx):
     await ctx.send(output)
 
 @bot.command(name="mapinfo",description="Gives information about the map type")
-async def mapinfo(ctx):
+async def mapinfo(ctx, map):
     messageContent = ctx.message.content
     print(messageContent)
+    print(map)
 
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
