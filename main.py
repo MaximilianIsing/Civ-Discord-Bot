@@ -159,7 +159,7 @@ mapFavoring = {
         "Continents_Plus": "Slightly land favored",
         "Archipelago": "Heavily naval favored",
         "Fractal": "Naval favored",
-        "Shuffle=": "Land favored",
+        "Shuffle": "Land favored",
         "Terra_Incognita": "Slightly land favored"
 
 }
