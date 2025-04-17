@@ -117,8 +117,6 @@ def replaceUnderscores(input):
 
 @bot.event
 async def on_ready():
-    
-
     print(f"Bot Ready")
 
 
@@ -252,6 +250,7 @@ async def admin_vote(ctx):
     else:
         await ctx.send("Insufficient permissions")
 
+
 @bot.command(name="vote", description="Starts lobby vote")
 async def vote(ctx, admin = False):
     lobbyHostingChannel = 1351993272096260127
@@ -259,6 +258,8 @@ async def vote(ctx, admin = False):
         voiceChannel = discord.utils.get(ctx.guild.voice_channels, name="Game Lobby")
         playerIDs = [member.id for member in voiceChannel.members]
 
+        messageContent = ctx.message.content
+        print(messageContent)
 
         if len(playerIDs) == 0:
             await ctx.send(f"<#{1351989426951295056}> is empty")
@@ -361,6 +362,8 @@ async def vote(ctx, admin = False):
                     await remainingMessage.delete()
                 else:
                     await remainingMessage.edit(content=output)
+        
+        remainingMessage.edit(content = "Vote Finished, Please Wait")
 
         messageIDs = [
             mapMessage.id,
