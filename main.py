@@ -247,11 +247,12 @@ def getPick(countList, n, nonePossible):
 
 async def fetchAndFormatReactions(ctx, messageIDs, playerIDs):
     reactions = [None] * len(messageIDs)
+    playerSet = playerIDs
 
     i = 0
     for messageID in messageIDs:
         message = await ctx.fetch_message(messageID)
-        formatted = await formatReactions(message.reactions,playerIDs)
+        formatted = await formatReactions(message.reactions,playerSet)
         reactions[i] = formatted
         i += 1
 
@@ -276,8 +277,11 @@ async def reroll(ctx):
         global mostRecentNumCivs
 
         print("Rerolling")
-        tempCivs = random.shuffle(mostRecentCivOptions.copy())
-        tempLeaders = random.shuffle(mostRecentLeaderOptions.copy())
+        tempCivs = mostRecentCivOptions.copy()
+        tempLeaders = mostRecentLeaderOptions.copy()
+
+        tempCivs = random.shuffle(tempCivs)
+        tempLeaders = random.shuffle(tempLeaders)
 
         for player in mostRecentPlayers:
                 output = f"<@{player}>\n"
