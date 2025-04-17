@@ -238,14 +238,22 @@ def getPick(countList, n, nonePossible):
 
 
 async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
-    # Fetch messages concurrently
-    messages = await asyncio.gather(*[ctx.fetch_message(msg_id) for msg_id in message_ids])
-    # Format reactions concurrently for each message
-    reactions = await asyncio.gather(*[
-        formatReactions(message.reactions, playerIDs) for message in messages
-    ])
+    messages = []
+    for msg_id in message_ids:
+        try:
+            message = await ctx.channel.fetch_message(msg_id)
+            messages.append(message)
+            await asyncio.sleep(0.5)  # Small delay to avoid rate limits
+        except discord.HTTPException as e:
+            print(f"Failed to fetch message {msg_id}: {e}")
 
-    return reactions
+    # Now format reactions
+    formatted = []
+    for message in messages:
+        result = await formatReactions(message.reactions, playerIDs)
+        formatted.append(result)
+
+    return formatted
 
 @bot.command(name="admin_vote", description = "Admin vote start")
 async def admin_vote(ctx):
