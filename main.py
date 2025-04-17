@@ -111,7 +111,7 @@ leaderEmojis = []
 civEmojiIDs = [None] * len(allCivs)
 leaderEmojiIDs = [None] * len(allLeaders)
 
-
+guild = bot.get_guild(YOUR_GUILD_ID)
 
 def replaceUnderscores(input):
     return input.replace("_", " ")
@@ -120,9 +120,9 @@ def replaceUnderscores(input):
 @bot.event
 async def on_ready():
     for civ in allCivs:
-        civEmojis.append(discord.utils.get(ctx.guild.emojis, name=civ))
+        civEmojis.append(discord.utils.get(guild.emojis, name=civ))
     for leader in allLeaders:
-        leaderEmojis.append(discord.utils.get(ctx.guild.emojis, name=leader))
+        leaderEmojis.append(discord.utils.get(guild.emojis, name=leader))
 
     for i in range(len(civEmojiIDs)):
             civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
@@ -130,7 +130,7 @@ async def on_ready():
     for i in range(len(leaderEmojiIDs)):
         leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
 
-    print("Bot Ready")
+    print(f"Bot Ready in {guild.name} ({guild.id})")
 
 
 @bot.event
