@@ -102,6 +102,8 @@ numCivOptions =  ["1️⃣", "2️⃣"]
 mostRecentCivOptions = []
 mostRecentLeaderOptions = []
 mostRecentPlayers = []
+mustRecentNumLeaders = 0
+mostRecentNumCivs = 0
 
 gameHasOccured = False
 
@@ -260,6 +262,9 @@ async def reroll(ctx):
     global mostRecentCivOptions
     global mostRecentLeaderOptions
     global mostRecentPlayers
+    global mustRecentNumLeaders
+    global mostRecentNumCivs
+
     if gameHasOccured:
         print("Rerolling")
         tempCivs = mostRecentCivOptions.copy()
@@ -269,12 +274,12 @@ async def reroll(ctx):
                 output = f"<@{player}>\n"
 
                 output += "__Civ Options:__\n"
-                for c in range(tempCivs):
+                for c in range(mostRecentNumCivs):
                     thisCiv = tempCivs.pop()
                     output += f"{civEmojiIDs[thisCiv]} - {replaceUnderscores(allCivs[thisCiv])}\n"
 
                 output += "__Leader Options:__\n"
-                for l in range(tempLeaders):
+                for l in range(mustRecentNumLeaders):
                     thisLeader = tempLeaders.pop()
                     output += f"{leaderEmojiIDs[thisLeader]} - {replaceUnderscores(allLeaders[thisLeader])}\n"
 
@@ -491,11 +496,15 @@ async def vote(ctx):
         global mostRecentCivOptions
         global mostRecentLeaderOptions
         global mostRecentPlayers
+        global mustRecentNumLeaders
+        global mostRecentNumCivs
         
         gameHasOccured = True
         mostRecentCivOptions = postBanCivs.copy()
         mostRecentLeaderOptions = postBanLeaders.copy()
         mostRecentPlayers = playerIDs.copy()
+        mustRecentNumLeaders = leaderOptions
+        mostRecentNumCivs = civOptions
 
         for player in playerIDs:
             output = f"<@{player}>\n"
