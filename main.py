@@ -314,7 +314,7 @@ async def vote(ctx):
             if len(playerIDs) == 0:
                 await ctx.send(f"<#{1351989426951295056}> is empty")
                 return
-            if len(playerIDs) == 1 and not admin:
+            if len(playerIDs) == 1:
                 await ctx.send(
                     f"<#{1351989426951295056}> has an insufficient amount of players (2 minimum)"
                 )
