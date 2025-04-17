@@ -248,13 +248,6 @@ async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
 
     return reactions
 
-@bot.command(name="admin_vote", description = "Admin vote start")
-async def admin_vote(ctx):
-    if ctx.author.id == OwnerID:
-        await vote(ctx, admin=True)
-    else:
-        await ctx.send("Insufficient permissions")
-
 def decipherIDs(message):
     IDs = re.findall(r"<@(\d+)>", message)
     IDs = [int(uid) for uid in IDs]
@@ -286,7 +279,7 @@ async def reroll(ctx):
         await ctx.send("Run a vote first (use /vote)")
 
 @bot.command(name="vote", description="Starts lobby vote")
-async def vote(ctx, admin = False):
+async def vote(ctx):
     lobbyHostingChannel = 1351993272096260127
     if ctx.channel.id == lobbyHostingChannel:  # In lobby_hosting channel
         voiceChannel = discord.utils.get(ctx.guild.voice_channels, name="Game Lobby")
