@@ -6,6 +6,7 @@ import asyncio
 import random
 import re
 from lists import *
+from helpers import *
 
 
 with open("TOKEN.txt", "r") as file:
@@ -46,8 +47,7 @@ leaderEmojiIDs = [None] * len(allLeaders)
 
 
 
-def replaceUnderscores(input):
-    return input.replace("_", " ")
+
 
 
 @bot.event
@@ -105,124 +105,40 @@ async def status(ctx):
     await ctx.send("Status: Online")
 
 
-def formatOptions(names, emojis):
-    output = ""
-    for i in range(len(names)):
-        output += emojis[i]
-        output += " - "
-        output += replaceUnderscores(names[i])
-
-        if i != len(names) - 1:
-            output += " |"
-        output += " "
-    return output
-
-async def formatReactions(reactionList, allPlayers):
-    countList = [0] * len(reactionList)
-
-    for r in range(len(reactionList)):
-       userReactions = reactionList[r].users()
-       async for user in userReactions:
-            if user.id in allPlayers:
-                countList[r] += 1
-    return countList
 
 
 
-def getNLargest(countsList, n):
-    if len(countsList) <= n:
-        return [[i] for i in range(len(countsList))]
-
-    # Initialize counts and indices
-    counts = [0] * n
-    indices = [[] for i in range(n)]  # Use lists to store indices
-
-    for i in range(len(countsList)):
-        for k in range(n):
-            if countsList[i] > counts[k]:
-                # Shift elements down and insert the new value
-                for p in range(n - 1, k - 1, -1):
-                    if p == k:
-                        counts[p] = countsList[i]
-                        indices[p] = [i]  # Reset indices for this position
-                    else:
-                        counts[p] = counts[p - 1]
-                        indices[p] = indices[p - 1]
-                break
-            elif countsList[i] == counts[k]:
-                # Append index if the value is equal to the current value
-                indices[k].append(i)
-                break
-
-    return indices
-
-def flattenList(list): # Flattens by 1 degree
-    output = []
-    for sublist in list:
-        for value in sublist:
-            output.append(value)
-    return output
-
-def getPick(countList, n, nonePossible):
-    picked = getNLargest(countList,n)
-    for i in range(len(picked)):
-        random.shuffle(picked[i])
-    picked = flattenList(picked)
-    if nonePossible:
-        options = []
-        for i in picked:
-            if countList[i] != 0:
-                options.append(i)
-        picked = options
-
-    if len(picked) > n:
-        return picked[:n]
-    else:
-        return picked
-
-
-async def fetchAndFormatReactions(ctx, messageIDs, playerIDs):
-    reactions = [None] * len(messageIDs)
-    playerSet = playerIDs
-
-    i = 0
-    for messageID in messageIDs:
-        message = await ctx.fetch_message(messageID)
-        formatted = await formatReactions(message.reactions,playerSet)
-        reactions[i] = formatted
-        i += 1
-
-    return reactions
 
 
 @bot.command(name="civlist", description="Lists all civs")
 async def civlist(ctx):
     output = "__Civ Options Are:__\n"
-    for civ in allCivs:
+    for civ in antiquityCivs:
+        output += f"{civ} - {civEmojiIDs[civDict[civ]]}\n"
+    output+="\n"
+    for civ in explorationCivs:
+        output += f"{civ} - {civEmojiIDs[civDict[civ]]}\n"
+    output+="\n"
+    for civ in modernCivs:
         output += f"{civ} - {civEmojiIDs[civDict[civ]]}\n"
     await ctx.send(output)
 
-def decipherIDs(message):
-    IDs = re.findall(r"<@(\d+)>", message)
-    IDs = [int(uid) for uid in IDs]
-
-    return IDs
 
 @bot.command(name="leaderlist", description="Lists all leaders")
 async def leaderlist(ctx):
     output = "__Leader Options Are:__\n"
     for leader in allLeaders:
-        output += f"{leader} - {leaderEmojiIDs[leaderDict[leader]]}\n"
+        output += f"{replaceUnderscores(leader)} - {leaderEmojiIDs[leaderDict[leader]]}\n"
     await ctx.send(output)
 
-def extractEmojiID(emoji):
-    match = re.search(r"<:[A-Za-z_]+:(\d+)>", emoji)
-    return match.group(1)
+
 
 @bot.command(name="leaderinfo",description="Gives information about the leader")
 async def leaderinfo(ctx, leader):
-
-    if leader in allLeaders:
+    messageContent = ctx.message.content
+    leader = replaceSpaces(extractLeader(messageContent))
+    print(messageContent)
+    if  replaceSpaces(leader) in allLeaders:
         leaderEmbed = discord.Embed(
             title = replaceUnderscores(leader),
             description = leaderInfoList[leader] + "\n\nUnlocks: " + leaderUnlocks[leader],
@@ -240,11 +156,15 @@ async def leaderinfo(ctx, leader):
 async def maplist(ctx):
     output = "__Map Options Are:__\n"
     for map in allMaps:
-        output += map + "\n"
+        output += replaceUnderscores(map) + "\n"
     await ctx.send(output)
 
+
+
 @bot.command(name="mapinfo",description="Gives information about the map type")
-async def mapinfo(ctx, map):
+async def mapinfo(ctx):
+    messageContent = ctx.message.content
+    map = replaceSpaces(extractMap(messageContent))
     if map in allMaps:
         mapEmbed = discord.Embed(
             title = replaceUnderscores(map),
