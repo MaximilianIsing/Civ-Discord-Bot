@@ -132,9 +132,9 @@ async def sync(ctx):
     if ctx.author.id == OwnerID:
         await bot.tree.sync()
         for civ in allCivs:
-            civEmojis.append(discord.utils.get(guild.emojis, name=civ))
+            civEmojis.append(discord.utils.get(ctx.guild.emojis, name=civ))
         for leader in allLeaders:
-            leaderEmojis.append(discord.utils.get(guild.emojis, name=leader))
+            leaderEmojis.append(discord.utils.get(ctx.guild.emojis, name=leader))
 
         for i in range(len(civEmojiIDs)):
                 civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
@@ -245,8 +245,15 @@ async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
 
     return reactions
 
+@bot.command(name="admin_vote", description = "Admin vote start")
+async def admin_vote(ctx):
+    if ctx.author.id == OwnerID:
+        await vote(ctx, True)
+    else:
+        await ctx.send("Insufficient permissions")
+
 @bot.command(name="vote", description="Starts lobby vote")
-async def vote(ctx):
+async def vote(ctx, admin = False):
     lobbyHostingChannel = 1351993272096260127
     if ctx.channel.id == lobbyHostingChannel:  # In lobby_hosting channel
         voiceChannel = discord.utils.get(ctx.guild.voice_channels, name="Game Lobby")
