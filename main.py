@@ -294,6 +294,9 @@ async def vote(ctx, admin = False):
 
         messageContent = ctx.message.content
         exceptionalPlayers = decipherIDs(messageContent)
+
+        print(messageContent)
+        print(exceptionalPlayers)
     
         if len(exceptionalPlayers) > 0:
             for player in exceptionalPlayers:
