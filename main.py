@@ -387,7 +387,6 @@ async def vote(ctx, admin = False):
 
                 if len(remaining) == 0:
                     allFinished = True
-                    await remainingMessage.delete()
                 else:
                     await remainingMessage.edit(content=output)
         
