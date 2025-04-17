@@ -75,6 +75,24 @@ allMaps = [
         "Terra_Incognita",
     ]
 
+mapInfoList = {
+        "Continents":"The Continents Plus map is the default recommended map type, and features two major landmasses, with several small islands scattered in between. These islands often contain Distant Land resources which can be worked to produce Treasure Fleets.",
+        "Continents_Plus":"The regular Continents map features two large landmasses, without the islands scattered in between, although there are occasionally a couple of them dotted around.",
+        "Archipelago":"The Archipelago map is roughly divided into two distinct halves, but instead of two main continents, there are several disconnected or thinly connected land masses on each side. There's plenty of water and coastal tiles, favoring a naval focused campaign.",
+        "Fractal":"Fractal map generation produces more randomly shaped land masses, which seems to result in fewer blunt edges/'unnatural' shapes, but less actual land area overall. There are still two major 'continent' areas and smaller islands between them, but continents may be split into several parts.",
+        "Shuffle":"Shuffle maps use a randomized preset to generate the map. We're not sure yet exactly how these calculations are made, but based on the map generation script files, Archipelago, Continents, and Fractal are all possibilities.",
+        "Terra_Incognita":"Terra Incognita generates a standard Continents map as the homeland landmass, and uses a randomized preset to generate the second landmass."
+}
+
+mapInfoLinks = {
+        "Continents":"https://oyster.ignimgs.com/mediawiki/apis.ign.com/civilization-7/1/19/Continents-standard.jpg?width=2240",
+        "Continents_Plus":"https://oyster.ignimgs.com/mediawiki/apis.ign.com/civilization-7/e/ef/Continents-plus-standard.jpg?width=2240",
+        "Archipelago":"https://oyster.ignimgs.com/mediawiki/apis.ign.com/civilization-7/d/d3/Arch-standard.jpg?width=2240",
+        "Fractal":"https://oyster.ignimgs.com/mediawiki/apis.ign.com/civilization-7/4/4e/Fractal-standard.jpg?width=2240",
+        "Shuffle":"https://oyster.ignimgs.com/mediawiki/apis.ign.com/civilization-7/f/f0/Shuffle-standard.jpg?width=2240",
+        "Terra_Incognita":"https://oyster.ignimgs.com/mediawiki/apis.ign.com/civilization-7/5/52/Terra-standard.jpg?width=2240"
+}
+
 mapEmojis = ["🇨", "🇵", "🇦", "🇫", "🇸", "🇹"]
 
 
@@ -266,7 +284,7 @@ def decipherIDs(message):
 
 @bot.command(name="maplist", description="Lists all maps")
 async def maplist(ctx):
-    output = ""
+    output = "Map Options Are:\n"
     for map in allMaps:
         output += map + "\n"
     await ctx.send(output)
@@ -274,8 +292,17 @@ async def maplist(ctx):
 @bot.command(name="mapinfo",description="Gives information about the map type")
 async def mapinfo(ctx, map):
     messageContent = ctx.message.content
-    print(messageContent)
-    print(map)
+    if map in allMaps:
+        mapEmbed = discord.Embed(
+            title = f"{map} Image",
+            description = f"Example of {map} generation",
+        )
+        mapEmbed.set_image(url=mapInfoLinks[map])
+
+        await ctx.send(mapInfoList[map])
+        await ctx.send(embed = )
+    else: 
+        await ctx.send(f"{map} isn't an option, use /mapinfo for a list of options (use exact formatting)")
 
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
