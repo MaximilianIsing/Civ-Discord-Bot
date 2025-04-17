@@ -266,13 +266,15 @@ def decipherIDs(message):
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
     global gameHasOccured
-    global mostRecentCivOptions
-    global mostRecentLeaderOptions
-    global mostRecentPlayers
-    global mustRecentNumLeaders
-    global mostRecentNumCivs
+    
 
     if gameHasOccured:
+        global mostRecentCivOptions
+        global mostRecentLeaderOptions
+        global mostRecentPlayers
+        global mustRecentNumLeaders
+        global mostRecentNumCivs
+
         print("Rerolling")
         tempCivs = random.shuffle(mostRecentCivOptions.copy())
         tempLeaders = random.shuffle(mostRecentLeaderOptions.copy())
