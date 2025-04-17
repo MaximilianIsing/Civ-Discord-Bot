@@ -118,7 +118,7 @@ def replaceUnderscores(input):
 
 @bot.event
 async def on_ready():
-    print(f"Bot Ready")
+    print("Bot Ready")
 
 
 @bot.event
@@ -151,6 +151,7 @@ async def sync(ctx):
 @bot.command(name="clear")
 async def clear(ctx):
     if ctx.author.id == OwnerID:
+        print("Clearing")
         await ctx.channel.purge(limit=500)
     else:
         await ctx.send("Insufficient permissions")
@@ -259,6 +260,30 @@ def decipherIDs(message):
     IDs = [int(uid) for uid in IDs]
 
     return IDs
+
+@bot.command(name="reroll", description="Rerolls draft picks")
+async def reroll(ctx):
+    if gameHasOccured:
+        print("Rerolling")
+        tempCivs = mostRecentCivOptions.copy()
+        tempLeaders = mostRecentLeaderOptions.copy()
+
+        for player in mostRecentPlayers:
+                output = f"<@{player}>\n"
+
+                output += "__Civ Options:__\n"
+                for c in range(tempCivs):
+                    thisCiv = tempCivs.pop()
+                    output += f"{civEmojiIDs[thisCiv]} - {replaceUnderscores(allCivs[thisCiv])}\n"
+
+                output += "__Leader Options:__\n"
+                for l in range(tempLeaders):
+                    thisLeader = tempLeaders.pop()
+                    output += f"{leaderEmojiIDs[thisLeader]} - {replaceUnderscores(allLeaders[thisLeader])}\n"
+
+                await ctx.send(output + "\n")
+    else:
+        await ctx.send("Run a vote first (use /vote)")
 
 @bot.command(name="vote", description="Starts lobby vote")
 async def vote(ctx, admin = False):
@@ -394,6 +419,7 @@ async def vote(ctx, admin = False):
                 else:
                     await remainingMessage.edit(content=output)
         
+        await finishedMessage.clear_reactions()
         await finishedMessage.edit(content = "Vote Finished, Please Wait")
 
         messageIDs = [
@@ -496,25 +522,7 @@ async def vote(ctx, admin = False):
     else:
         await ctx.send(f"Please use <#{lobbyHostingChannel}> for this command")
 
-@bot.command(name="reroll", description="Rerolls draft picks")
-async def reroll(ctx):
-    tempCivs = mostRecentCivOptions.copy()
-    tempLeaders = mostRecentLeaderOptions.copy()
 
-    for player in mostRecentPlayers:
-            output = f"<@{player}>\n"
-
-            output += "__Civ Options:__\n"
-            for c in range(tempCivs):
-                thisCiv = tempCivs.pop()
-                output += f"{civEmojiIDs[thisCiv]} - {replaceUnderscores(allCivs[thisCiv])}\n"
-
-            output += "__Leader Options:__\n"
-            for l in range(tempLeaders):
-                thisLeader = tempLeaders.pop()
-                output += f"{leaderEmojiIDs[thisLeader]} - {replaceUnderscores(allLeaders[thisLeader])}\n"
-
-            await ctx.send(output + "\n")
 
 
 
