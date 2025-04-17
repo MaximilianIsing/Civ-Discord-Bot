@@ -44,11 +44,6 @@ leaderEmojiIDs = [None] * len(allLeaders)
 
 
 
-
-
-
-
-
 @bot.event
 async def on_ready():
     global thisGuild
