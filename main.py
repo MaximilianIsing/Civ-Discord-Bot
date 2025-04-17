@@ -256,6 +256,7 @@ def decipherIDs(message):
 
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
+    global gameHasOccured
     if gameHasOccured:
         print("Rerolling")
         tempCivs = mostRecentCivOptions.copy()
@@ -287,9 +288,6 @@ async def vote(ctx):
 
         messageContent = ctx.message.content
         exceptionalPlayers = decipherIDs(messageContent)
-
-        print(messageContent)
-        print(exceptionalPlayers)
     
         if len(exceptionalPlayers) > 0:
             for player in exceptionalPlayers:
@@ -485,7 +483,8 @@ async def vote(ctx):
         civOptions = getPick(numCivReactions,1,False)[0] + 1
         if len(playerIDs) > 4:
             civOptions = 1
-        
+            
+        global gameHasOccured
         gameHasOccured = True
         mostRecentCivOptions = postBanCivs.copy()
         mostRecentLeaderOptions = postBanLeaders.copy()
