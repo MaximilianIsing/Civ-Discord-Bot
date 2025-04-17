@@ -268,14 +268,28 @@ async def vote(ctx, admin = False):
         playerIDs = [member.id for member in voiceChannel.members]
 
         messageContent = ctx.message.content
-        excludedPlayers = decipherIDs(messageContent)
+        exceptionalPlayers = decipherIDs(messageContent)
+    
+        excludedPlayers = []
 
         hasExcluded = False
-        if len(excludedPlayers) > 0:
-            for player in excludedPlayers:
+        if len(exceptionalPlayers) > 0:
+            for player in exceptionalPlayers:
                 if player in playerIDs:
+                    excludedPlayers.append(player)
                     playerIDs.remove(player)
                     hasExcluded = True
+        
+        addedPlayers = []
+
+        hasAdded = False
+        if len(exceptionalPlayers) > 0:
+            for player in exceptionalPlayers:
+                if not player in playerIDs:
+                    addedPlayers.append(player)
+                    playerIDs.append(player)
+                    hasAdded = True
+
 
         if len(playerIDs) == 0:
             await ctx.send(f"<#{1351989426951295056}> is empty")
@@ -299,17 +313,6 @@ async def vote(ctx, admin = False):
             output += " "
 
             i += 1
-        
-        if hasExcluded:
-            i = 0
-            for player in excludedPlayers:
-                output += f"<@{player}>"
-
-                if i != len(playerIDs) - 1:
-                    output += ","
-                output += " "
-
-                i += 1
 
 
         await ctx.send(output)
@@ -387,10 +390,11 @@ async def vote(ctx, admin = False):
 
                 if len(remaining) == 0:
                     allFinished = True
+                    await remainingMessage.delete()
                 else:
                     await remainingMessage.edit(content=output)
         
-        await remainingMessage.edit(content = "Vote Finished, Please Wait")
+        await finishedMessage.edit(content = "Vote Finished, Please Wait")
 
         messageIDs = [
             mapMessage.id,
