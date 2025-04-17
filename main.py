@@ -245,13 +245,15 @@ def getPick(countList, n, nonePossible):
         return picked
 
 
-async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
-    # Fetch messages concurrently
-    messages = await [ctx.fetch_message(msg_id) for msg_id in message_ids]
-    # Format reactions concurrently for each message
-    reactions = await [
-        formatReactions(message.reactions, playerIDs) for message in messages
-    ]
+async def fetchAndFormatReactions(ctx, messageIDs, playerIDs):
+    reactions = [None] * len(messageIDs)
+
+    i = 0
+    for messageID in messageIDs:
+        message = await ctx.fetch_message(messageID)
+        formatted = await formatReactions(message.reactions,playerIDs)
+        reactions[i] = formatted
+        i += 1
 
     return reactions
 
