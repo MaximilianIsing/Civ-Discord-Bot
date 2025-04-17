@@ -273,7 +273,6 @@ async def vote(ctx):
 
             i += 1
 
-
         await ctx.send(output)
 
 

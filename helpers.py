@@ -20,11 +20,9 @@ def formatOptions(names, emojis):
 async def formatReactions(reactionList, allPlayers):
     countList = [0] * len(reactionList) 
 
-    for r in range(len(reactionList)):
-       userReactions = reactionList[r].users()
-       async for user in userReactions:
-            if user.id in allPlayers:
-                countList[r] += 1
+    for r, reaction in enumerate(reactionList):
+       userReactions = [user async for user in reaction.users()]
+       countList[r] += sum(1 for user in userReactions if user.id in allPlayers)
     return countList
 
 async def fetchAndFormatReactions(ctx, messageIDs, playerIDs):
@@ -37,8 +35,8 @@ async def fetchAndFormatReactions(ctx, messageIDs, playerIDs):
     i = 0
     for messageID in messageIDs:
         message = await ctx.fetch_message(messageID)
-        formatted = await formatReactions(message.reactions,playerSet)
-        
+        formatted = await formatReactions(message.reactions, playerSet)
+
         loadingBarMessage[i] = "▰"
         await loadingBar.edit(content = "".join(loadingBarMessage))
         reactions[i] = formatted
