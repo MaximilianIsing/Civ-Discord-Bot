@@ -242,11 +242,11 @@ def getPick(countList, n, nonePossible):
 
 async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
     # Fetch messages concurrently
-    messages = await asyncio.gather(*[ctx.fetch_message(msg_id) for msg_id in message_ids])
+    messages = await [ctx.fetch_message(msg_id) for msg_id in message_ids]
     # Format reactions concurrently for each message
-    reactions = await asyncio.gather(*[
+    reactions = await [
         formatReactions(message.reactions, playerIDs) for message in messages
-    ])
+    ]
 
     return reactions
 
