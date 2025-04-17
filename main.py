@@ -4,7 +4,6 @@ from discord.ext import commands
 import time
 import asyncio
 import random
-import re
 from lists import *
 from helpers import *
 

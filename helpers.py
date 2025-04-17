@@ -1,3 +1,5 @@
+import re
+import random
 def replaceUnderscores(input):
     return input.replace("_", " ")
 def replaceSpaces(input):
