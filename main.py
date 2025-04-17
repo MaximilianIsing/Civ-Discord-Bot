@@ -367,7 +367,7 @@ async def leaderinfo(ctx, leader):
     if leader in allLeaders:
         mapEmbed = discord.Embed(
             title = replaceUnderscores(leader),
-            description = leaderInfoList[leader] + "\n\n" + leaderUnlocks[leader],
+            description = leaderInfoList[leader] + "\n\nUnlocks: " + leaderUnlocks[leader],
             color = discord.Color.orange()
         )
         await ctx.send(embed = mapEmbed)
@@ -392,7 +392,6 @@ async def mapinfo(ctx, map):
         )
         mapEmbed.set_image(url=mapInfoLinks[map])
 
-        await ctx.send(mapInfoList[map])
         await ctx.send(embed = mapEmbed)
     else: 
         await ctx.send(f"\"{map}\" isn't an option, use /maplist for a list of options (use exact formatting)")
