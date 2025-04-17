@@ -4,6 +4,7 @@ from discord.ext import commands
 import time
 import asyncio
 import random
+import re
 
 
 with open("TOKEN.txt", "r") as file:
@@ -250,6 +251,11 @@ async def admin_vote(ctx):
     else:
         await ctx.send("Insufficient permissions")
 
+def decipherIDs(message):
+    IDs = re.findall(r"<@(\d+)>", message)
+    IDs = [int(uid) for uid in IDs]
+
+    return IDs
 
 @bot.command(name="vote", description="Starts lobby vote")
 async def vote(ctx, admin = False):
@@ -259,7 +265,14 @@ async def vote(ctx, admin = False):
         playerIDs = [member.id for member in voiceChannel.members]
 
         messageContent = ctx.message.content
-        print(messageContent)
+        excludedPlayers = decipherIDs(messageContent)
+
+        hasExcluded = False
+        if len(excludedPlayer) > 0:
+            for player in excludedPlayers:
+                if player in playerIDs:
+                    playerIDs.remove(player)
+                    hasExcluded = True
 
         if len(playerIDs) == 0:
             await ctx.send(f"<#{1351989426951295056}> is empty")
@@ -273,7 +286,7 @@ async def vote(ctx, admin = False):
         await ctx.channel.purge(limit=500)
 
         # Players
-        output = ""
+        output = "Players: "
         i = 0
         for player in playerIDs:
             output += f"<@{player}>"
@@ -283,8 +296,20 @@ async def vote(ctx, admin = False):
             output += " "
 
             i += 1
+        
+        if hasExcluded:
+            i = 0
+            for player in excludedPlayers:
+                output += f"<@{player}>"
 
-        await ctx.send("Players: " + output)
+                if i != len(playerIDs) - 1:
+                    output += ","
+                output += " "
+
+                i += 1
+
+
+        await ctx.send(output)
 
 
         mapMessage = await ctx.send("Map Options: " + formatOptions(allMaps,mapEmojis))
