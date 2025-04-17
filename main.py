@@ -4,7 +4,6 @@ from discord.ext import commands
 import time
 import asyncio
 import random
-import ssl
 
 
 with open("TOKEN.txt", "r") as file:
@@ -110,7 +109,6 @@ leaderEmojis = []
 civEmojiIDs = [None] * len(allCivs)
 leaderEmojiIDs = [None] * len(allLeaders)
 
-guild = bot.get_guild(1351787046720503808)
 
 
 def replaceUnderscores(input):
@@ -119,18 +117,9 @@ def replaceUnderscores(input):
 
 @bot.event
 async def on_ready():
-    for civ in allCivs:
-        civEmojis.append(discord.utils.get(guild.emojis, name=civ))
-    for leader in allLeaders:
-        leaderEmojis.append(discord.utils.get(guild.emojis, name=leader))
+    
 
-    for i in range(len(civEmojiIDs)):
-            civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
-
-    for i in range(len(leaderEmojiIDs)):
-        leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
-
-    print(f"Bot Ready in {guild.name} ({guild.id})")
+    print(f"Bot Ready")
 
 
 @bot.event
@@ -142,6 +131,16 @@ async def on_message(message):
 async def sync(ctx):
     if ctx.author.id == OwnerID:
         await bot.tree.sync()
+        for civ in allCivs:
+            civEmojis.append(discord.utils.get(guild.emojis, name=civ))
+        for leader in allLeaders:
+            leaderEmojis.append(discord.utils.get(guild.emojis, name=leader))
+
+        for i in range(len(civEmojiIDs)):
+                civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
+
+        for i in range(len(leaderEmojiIDs)):
+            leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
         await ctx.send("Synced")
     else:
         await ctx.send("Insufficient permissions")
