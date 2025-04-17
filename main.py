@@ -257,6 +257,9 @@ def decipherIDs(message):
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
     global gameHasOccured
+    global mostRecentCivOptions
+    global mostRecentLeaderOptions
+    global mostRecentPlayers
     if gameHasOccured:
         print("Rerolling")
         tempCivs = mostRecentCivOptions.copy()
@@ -485,6 +488,10 @@ async def vote(ctx):
             civOptions = 1
             
         global gameHasOccured
+        global mostRecentCivOptions
+        global mostRecentLeaderOptions
+        global mostRecentPlayers
+        
         gameHasOccured = True
         mostRecentCivOptions = postBanCivs.copy()
         mostRecentLeaderOptions = postBanLeaders.copy()
