@@ -28,18 +28,31 @@ civGuild = None
 
 doneVotingCheck = 2 # Num of seconds between checks
 
-mostRecentCivOptions = []
-mostRecentLeaderOptions = []
-mostRecentPlayers = []
-mustRecentNumLeaders = 0
-mostRecentNumCivs = 0
+lobbyHostingChannels = [1351993272096260127, 1362542399905202300]
+voiceHostingChannels = {
+    1351993272096260127: 1362542552376410252,
+    1362542399905202300: 1351989426951295056
+}
 
-gameHasOccured = False
+
+mostRecentCivOptions = {channel: [] for channel in lobbyHostingChannels}
+mostRecentLeaderOptions = {channel: [] for channel in lobbyHostingChannels}
+mostRecentPlayers = {channel: [] for channel in lobbyHostingChannels}
+mustRecentNumLeaders = {channel: 0 for channel in lobbyHostingChannels}
+mostRecentNumCivs = {channel: 0 for channel in lobbyHostingChannels}
+gameHasOccured = {channel: False for channel in lobbyHostingChannels}
+
+playerDraftMessagePointers = {channel: [] for channel in lobbyHostingChannels}
+
+
+
 
 civEmojis = []
 leaderEmojis = []
 civEmojiIDs = [None] * len(allCivs)
 leaderEmojiIDs = [None] * len(allLeaders)
+
+
 
 
 
@@ -174,44 +187,53 @@ async def mapinfo(ctx):
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
     global gameHasOccured
+    thisChannelID = ctx.channel.id
+    if thisChannelID not in lobbyHostingChannels:
+        await ctx.send(f"Please only use this command inside a lobby hosting channel")
+        return
     
-
-    if gameHasOccured:
+    if gameHasOccured[thisChannelID]:
         global mostRecentCivOptions
         global mostRecentLeaderOptions
         global mostRecentPlayers
         global mustRecentNumLeaders
         global mostRecentNumCivs
+        global playerDraftMessagePointers
 
-        print("Rerolling")
-        tempCivs = mostRecentCivOptions.copy()
-        tempLeaders = mostRecentLeaderOptions.copy()
+        await ctx.message.delete()
+        for message in playerDraftMessagePointers[thisChannelID]:
+            await message.delete()
+        playerDraftMessagePointers[thisChannelID].clear()
+
+        tempCivs = mostRecentCivOptions[thisChannelID].copy()
+        tempLeaders = mostRecentLeaderOptions[thisChannelID].copy()
 
         random.shuffle(tempCivs)
         random.shuffle(tempLeaders)
 
-        for player in mostRecentPlayers:
+        for player in mostRecentPlayers[thisChannelID]:
                 output = f"<@{player}>\n"
 
                 output += "__Civ Options:__\n"
-                for c in range(mostRecentNumCivs):
+                for c in range(mostRecentNumCivs[thisChannelID]):
                     thisCiv = tempCivs.pop()
                     output += f"{civEmojiIDs[thisCiv]} - {replaceUnderscores(antiquityCivs[thisCiv])}\n"
 
                 output += "__Leader Options:__\n"
-                for l in range(mustRecentNumLeaders):
+                for l in range(mustRecentNumLeaders[thisChannelID]):
                     thisLeader = tempLeaders.pop()
                     output += f"{leaderEmojiIDs[thisLeader]} - {replaceUnderscores(allLeaders[thisLeader])}\n"
 
-                await ctx.send(output + "\n")
+                thisMessage = await ctx.send(output + "\n")
+                playerDraftMessagePointers[thisChannelID].append(thisMessage)
     else:
         await ctx.send("Run a vote first (use /vote)")
 
 @bot.command(name="vote", description="Starts lobby vote")
 async def vote(ctx):
-    lobbyHostingChannel = 1351993272096260127
-    if ctx.channel.id == lobbyHostingChannel:  # In lobby_hosting channel
-        voiceChannel = discord.utils.get(ctx.guild.voice_channels, name="Game Lobby")
+    thisChannelID = ctx.channel.id
+    if thisChannelID in lobbyHostingChannels:  # In lobby_hosting channel
+        voiceChannel = ctx.guild.get_channel(voiceHostingChannels[thisChannelID])
         playerIDs = [member.id for member in voiceChannel.members]
 
         messageContent = ctx.message.content
@@ -229,11 +251,11 @@ async def vote(ctx):
 
 
         if len(playerIDs) == 0:
-            await ctx.send(f"<#{1351989426951295056}> is empty")
+            await ctx.send(f"<#{voiceHostingChannels[thisChannelID]}> is empty")
             return
         if len(playerIDs) == 1:
             await ctx.send(
-                f"<#{1351989426951295056}> has an insufficient amount of players (2 minimum)"
+                f"<#{voiceHostingChannels[thisChannelID]}> has an insufficient amount of players (2 minimum)"
             )
             return
 
@@ -424,13 +446,15 @@ async def vote(ctx):
         global mostRecentPlayers
         global mustRecentNumLeaders
         global mostRecentNumCivs
+        global playerDraftMessagePointers
         
-        gameHasOccured = True
-        mostRecentCivOptions = postBanCivs.copy()
-        mostRecentLeaderOptions = postBanLeaders.copy()
-        mostRecentPlayers = playerIDs.copy()
-        mustRecentNumLeaders = leaderOptions
-        mostRecentNumCivs = civOptions
+        gameHasOccured[thisChannelID] = True
+        mostRecentCivOptions[thisChannelID] = postBanCivs.copy()
+        mostRecentLeaderOptions[thisChannelID] = postBanLeaders.copy()
+        mostRecentPlayers[thisChannelID] = playerIDs.copy()
+        mustRecentNumLeaders[thisChannelID] = leaderOptions
+        mostRecentNumCivs[thisChannelID] = civOptions
+        playerDraftMessagePointers[thisChannelID].clear()
 
         for player in playerIDs:
             output = f"<@{player}>\n"
@@ -445,9 +469,10 @@ async def vote(ctx):
                 thisLeader = postBanLeaders.pop()
                 output += f"{leaderEmojiIDs[thisLeader]} - {replaceUnderscores(allLeaders[thisLeader])}\n"
 
-            await ctx.send(output + "\n")
+            thisMessage = await ctx.send(output + "\n")
+            playerDraftMessagePointers[thisChannelID].append(thisMessage)
     else:
-        await ctx.send(f"Please use <#{lobbyHostingChannel}> for this command")
+        await ctx.send(f"Please only use this command inside a lobby hosting channel")
 
 
 

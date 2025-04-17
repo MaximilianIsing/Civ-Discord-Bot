@@ -39,6 +39,7 @@ modernCivs = [
         "Russia",
         "Siam"
 ]
+
 allCivs = antiquityCivs + explorationCivs + modernCivs
 civDict = {civ: index for index, civ in enumerate(allCivs)}
 
