@@ -264,6 +264,18 @@ def decipherIDs(message):
 
     return IDs
 
+@bot.command(name="maplist", description="Lists all maps")
+async def maplist(ctx):
+    output = ""
+    for map in allMaps:
+        output += map + "\n"
+    await ctx.send(output)
+
+@bot.command(name="mapinfo",description="Gives information about the map type")
+async def mapinfo(ctx):
+    messageContent = ctx.message.content
+    print(messageContent)
+
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
     global gameHasOccured
