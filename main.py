@@ -4,14 +4,13 @@ from discord.ext import commands
 import time
 import asyncio
 import random
+import ssl
+
 
 with open("TOKEN.txt", "r") as file:
     content = file.read()
 
 Token = content
-
-
-
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -112,6 +111,7 @@ civEmojiIDs = [None] * len(allCivs)
 leaderEmojiIDs = [None] * len(allLeaders)
 
 guild = bot.get_guild(1351787046720503808)
+
 
 def replaceUnderscores(input):
     return input.replace("_", " ")
