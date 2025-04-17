@@ -305,7 +305,7 @@ async def mapinfo(ctx, map):
     if map in allMaps:
         mapEmbed = discord.Embed(
             title = replaceUnderscores(map),
-            description = mapinfoList[map] + "\n" + mapFavoring[map],
+            description = mapInfoList[map] + "\n" + mapFavoring[map],
             color = discord.Color.blue()
         )
         mapEmbed.set_image(url=mapInfoLinks[map])
@@ -313,7 +313,7 @@ async def mapinfo(ctx, map):
         await ctx.send(mapInfoList[map])
         await ctx.send(embed = mapEmbed)
     else: 
-        await ctx.send(f"{map} isn't an option, use /maplist for a list of options (use exact formatting)")
+        await ctx.send(f"\"{map}\" isn't an option, use /maplist for a list of options (use exact formatting)")
 
 @bot.command(name="reroll", description="Rerolls draft picks")
 async def reroll(ctx):
