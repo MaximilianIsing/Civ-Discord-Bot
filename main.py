@@ -280,8 +280,8 @@ async def reroll(ctx):
         tempCivs = mostRecentCivOptions.copy()
         tempLeaders = mostRecentLeaderOptions.copy()
 
-        tempCivs = random.shuffle(tempCivs)
-        tempLeaders = random.shuffle(tempLeaders)
+        random.shuffle(tempCivs)
+        random.shuffle(tempLeaders)
 
         for player in mostRecentPlayers:
                 output = f"<@{player}>\n"
