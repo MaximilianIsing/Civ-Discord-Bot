@@ -306,11 +306,10 @@ async def vote(ctx, admin = False):
                     hasExcluded = True
         
         addedPlayers = []
-
         hasAdded = False
         if len(exceptionalPlayers) > 0:
             for player in exceptionalPlayers:
-                if not player in playerIDs:
+                if player not in playerIDs:
                     addedPlayers.append(player)
                     playerIDs.append(player)
                     hasAdded = True
