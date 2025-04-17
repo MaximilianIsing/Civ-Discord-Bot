@@ -422,7 +422,9 @@ async def vote(ctx):
                     await remainingMessage.edit(content=output)
         
         await finishedMessage.clear_reactions()
-        await finishedMessage.edit(content = "Vote Finished, Please Wait")
+        await finishedMessage.edit(content = "Vote Finished: Please Wait")
+
+        start = time.time()
 
         messageIDs = [
             mapMessage.id,
@@ -439,7 +441,10 @@ async def vote(ctx):
         mapReactions, startReactions, crisisReactions, civReactions, numLeaderReactions, firstLeaderReactions, secondLeaderReactions = allReactions
 
         leaderReactions = firstLeaderReactions + secondLeaderReactions
+        
+        end = time.time()
 
+        await finishedMessage.edit(content = f"Vote Finished: Loading Took {end - start:.2f} Seconds")
 
         if len(playerIDs) <= 4:
             finalNumCivMessage = await ctx.fetch_message(numCivMessage.id)
@@ -511,7 +516,9 @@ async def vote(ctx):
         
         gameHasOccured = True
         mostRecentCivOptions = postBanCivs.copy()
+        mostRecentCivOptions = random.shuffle(mostRecentCivOptions)
         mostRecentLeaderOptions = postBanLeaders.copy()
+        mostRecentLeaderOptions = random.shuffle(mostRecentLeaderOptions)
         mostRecentPlayers = playerIDs.copy()
         mustRecentNumLeaders = leaderOptions
         mostRecentNumCivs = civOptions
