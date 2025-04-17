@@ -295,24 +295,15 @@ async def vote(ctx, admin = False):
         messageContent = ctx.message.content
         exceptionalPlayers = decipherIDs(messageContent)
     
-        excludedPlayers = []
-
-        hasExcluded = False
         if len(exceptionalPlayers) > 0:
             for player in exceptionalPlayers:
                 if player in playerIDs:
-                    excludedPlayers.append(player)
                     playerIDs.remove(player)
-                    hasExcluded = True
         
-        addedPlayers = []
-        hasAdded = False
         if len(exceptionalPlayers) > 0:
             for player in exceptionalPlayers:
                 if player not in playerIDs:
-                    addedPlayers.append(player)
                     playerIDs.append(player)
-                    hasAdded = True
 
 
         if len(playerIDs) == 0:
