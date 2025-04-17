@@ -138,11 +138,11 @@ async def sync(ctx):
             leaderEmojis.append(discord.utils.get(ctx.guild.emojis, name=leader))
 
         for i in range(len(civEmojiIDs)):
-                civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
+            civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
 
         for i in range(len(leaderEmojiIDs)):
             leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
-            
+
         await ctx.send("Synced")
     else:
         await ctx.send("Insufficient permissions")
@@ -391,7 +391,7 @@ async def vote(ctx, admin = False):
                 else:
                     await remainingMessage.edit(content=output)
         
-        remainingMessage.edit(content = "Vote Finished, Please Wait")
+        await remainingMessage.edit(content = "Vote Finished, Please Wait")
 
         messageIDs = [
             mapMessage.id,
@@ -493,8 +493,8 @@ async def vote(ctx, admin = False):
     else:
         await ctx.send(f"Please use <#{lobbyHostingChannel}> for this command")
 
-
-async def reRoll(ctx):
+@bot.command(name="reroll", description="Rerolls draft picks")
+async def reroll(ctx):
     tempCivs = mostRecentCivOptions.copy()
     tempLeaders = mostRecentLeaderOptions.copy()
 
