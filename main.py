@@ -110,7 +110,7 @@ leaderEmojis = []
 civEmojiIDs = [None] * len(allCivs)
 leaderEmojiIDs = [None] * len(allLeaders)
 
-adminByPass = False
+
 
 def replaceUnderscores(input):
     return input.replace("_", " ")
@@ -250,10 +250,8 @@ async def fetchAndFormatReactions(ctx,message_ids, playerIDs):
 
 @bot.command(name="admin_vote", description = "Admin vote start")
 async def admin_vote(ctx):
-    global adminByPass
     if ctx.author.id == OwnerID:
-        adminByPass = True
-        await vote(ctx)
+        await vote(ctx, admin=True)
     else:
         await ctx.send("Insufficient permissions")
 
@@ -288,9 +286,8 @@ async def reroll(ctx):
         await ctx.send("Run a vote first (use /vote)")
 
 @bot.command(name="vote", description="Starts lobby vote")
-async def vote(ctx):
+async def vote(ctx, admin = False):
     lobbyHostingChannel = 1351993272096260127
-    global adminByPass
     if ctx.channel.id == lobbyHostingChannel:  # In lobby_hosting channel
         voiceChannel = discord.utils.get(ctx.guild.voice_channels, name="Game Lobby")
         playerIDs = [member.id for member in voiceChannel.members]
@@ -312,17 +309,14 @@ async def vote(ctx):
                     playerIDs.append(player)
 
 
-        if not adminByPass:
-            if len(playerIDs) == 0:
-                await ctx.send(f"<#{1351989426951295056}> is empty")
-                return
-            if len(playerIDs) == 1:
-                await ctx.send(
-                    f"<#{1351989426951295056}> has an insufficient amount of players (2 minimum)"
-                )
-                return
-        else:
-            adminByPass = False
+        if len(playerIDs) == 0:
+            await ctx.send(f"<#{1351989426951295056}> is empty")
+            return
+        if len(playerIDs) == 1 and not admin:
+            await ctx.send(
+                f"<#{1351989426951295056}> has an insufficient amount of players (2 minimum)"
+            )
+            return
 
         await ctx.channel.purge(limit=500)
 
