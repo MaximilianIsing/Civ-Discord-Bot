@@ -121,3 +121,11 @@ def extractMap(message):
         return match.group(1)
     else:
         return "None"
+
+
+def extractWonder(message):
+    match = re.search(r"^/wonderinfo\s+(.+)", message)
+    if match:
+        return match.group(1)
+    else:
+        return "None"

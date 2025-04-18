@@ -7,7 +7,6 @@ import random
 from lists import *
 from helpers import *
 
-
 with open("TOKEN.txt", "r") as file:
     content = file.read()
 
@@ -21,9 +20,11 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 guildID = 1351787046720503808
 civGuildID = 1362491827478986752
+wonderGuildID = 1362574955375493291
 
 thisGuild = None
 civGuild = None
+wonderGuild = None
 
 
 doneVotingCheck = 2 # Num of seconds between checks
@@ -47,10 +48,15 @@ playerDraftMessagePointers = {channel: [] for channel in lobbyHostingChannels}
 
 
 
+
 civEmojis = []
 leaderEmojis = []
+wonderEmojis = []
+wonderEmojiIDs = [None] * len(allWonders)
 civEmojiIDs = [None] * len(allCivs)
 leaderEmojiIDs = [None] * len(allLeaders)
+
+
 
 
 
@@ -61,24 +67,29 @@ leaderEmojiIDs = [None] * len(allLeaders)
 async def on_ready():
     global thisGuild
     global civGuild
+    global wonderGuild
     thisGuild = await bot.fetch_guild(guildID)
     civGuild = await bot.fetch_guild(civGuildID)
-
+    wonderGuild = await bot.fetch_guild(wonderGuildID)
     for civ in allCivs:
         civEmojis.append(discord.utils.get(civGuild.emojis, name=civ))
 
     for leader in allLeaders:
         leaderEmojis.append(discord.utils.get(thisGuild.emojis, name=leader))
 
+    for wonder in allWonderIDs:
+        wonderEmojis.append(discord.utils.get(wonderGuild.emojis, name=wonder))
 
 
     for i in range(len(civEmojiIDs)):
         civEmojiIDs[i] = f"<:{civEmojis[i].name}:{civEmojis[i].id}>"
 
-
-    
     for i in range(len(leaderEmojiIDs)):
         leaderEmojiIDs[i] = f"<:{leaderEmojis[i].name}:{leaderEmojis[i].id}>"
+
+    for i in range(len(allWonders)):
+        wonderEmojiIDs[i] = f"<:{wonderEmojis[i].name}:{wonderEmojis[i].id}>"
+
 
     print("Bot Ready")
 
@@ -110,12 +121,45 @@ async def clear(ctx):
 @bot.command(name="status", description="Say hello!")
 async def status(ctx):
     await ctx.send("Status: Online")
+ 
 
+@bot.command(name="wonderlist", description="Lists all wonders")
+async def wonderlist(ctx):
+    antiquity = "__Wonder Options Are:__\n"
+    
+    i = 0
+    for wonder in antiquityWonders:
+        antiquity += f"{wonder.name} - {wonderEmojiIDs[wonderDict[replaceSpaces(wonder.name)]]}"
+        if i != len(antiquityWonders)-1:
+            antiquity += ", "
+            
+        i += 1
+    await ctx.send(antiquity)
 
+    exploration = "** **\n"
+    i = 0
+    for wonder in explorationWonders:
+        exploration += f"{wonder.name} - {wonderEmojiIDs[wonderDict[replaceSpaces(wonder.name)]]}"
+        if i != len(explorationWonders)-1:
+            exploration += ", "
 
+        i += 1
+    await ctx.send(exploration)
 
+    modern = "** **\n"
+    i = 0
+    for wonder in modernWonders:
+        modern += f"{wonder.name} - {wonderEmojiIDs[wonderDict[replaceSpaces(wonder.name)]]}"
+        if i != len(modernWonders)-1:
+            modern += ", "
 
+        i += 1
+    await ctx.send(modern)
 
+@bot.command(name="wonderinfo", description="ives information about the wonder")
+async def wonderinfo(ctx):
+    messageContent = ctx.message.content
+    wonder = replaceSpaces(extractWonder(messageContent))
 
 @bot.command(name="civlist", description="Lists all civs")
 async def civlist(ctx):
