@@ -129,3 +129,17 @@ def extractWonder(message):
         return match.group(1)
     else:
         return "None"
+
+def autoCapitalize(message):
+    exceptions = ["of", "a", "o","de"]
+
+    words = message.split('_')
+    result = []
+    for word in words:
+        if word:
+            if word in exceptions:
+                formatted_word = word.lower()
+            else:
+                formatted_word = word[0].upper() + word[1:].lower()
+            result.append(formatted_word)
+    return '_'.join(result)

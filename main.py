@@ -131,7 +131,7 @@ async def wonderlist(ctx):
     for wonder in antiquityWonders:
         antiquity += f"{wonder.name} - {wonderEmojiIDs[wonderDict[replaceSpaces(wonder.name)]]}"
         if i != len(antiquityWonders)-1:
-            antiquity += ", "
+            antiquity += " | "
             
         i += 1
     await ctx.send(antiquity)
@@ -141,7 +141,7 @@ async def wonderlist(ctx):
     for wonder in explorationWonders:
         exploration += f"{wonder.name} - {wonderEmojiIDs[wonderDict[replaceSpaces(wonder.name)]]}"
         if i != len(explorationWonders)-1:
-            exploration += ", "
+            exploration += " | "
 
         i += 1
     await ctx.send(exploration)
@@ -151,7 +151,7 @@ async def wonderlist(ctx):
     for wonder in modernWonders:
         modern += f"{wonder.name} - {wonderEmojiIDs[wonderDict[replaceSpaces(wonder.name)]]}"
         if i != len(modernWonders)-1:
-            modern += ", "
+            modern += " | "
 
         i += 1
     await ctx.send(modern)
@@ -160,18 +160,55 @@ async def wonderlist(ctx):
 async def wonderinfo(ctx):
     messageContent = ctx.message.content
     wonder = replaceSpaces(extractWonder(messageContent))
+    wonder = autoCapitalize(wonder)
+    if  wonder in allWonderIDs:
+        thisWonder = allWonders[wonderDict[wonder]]
+
+
+        wonderEmbed = discord.Embed(
+            title = replaceUnderscores(wonder),
+            description = f"{thisWonder.age} age wonder",
+            color = discord.Color.purple()
+        )
+
+        wonderEmbed.add_field(
+            name='Effect:', value=f"{thisWonder.effect}\n", inline = False
+        )
+
+        wonderEmbed.add_field(
+            name='Placement:', value=f"{thisWonder.condition}\n", inline = False
+        )
+
+        wonderEmbed.add_field(
+            name='Cost (Online):', value=f'{int(thisWonder.cost/2)} production', inline = True
+        )
+        if thisWonder.civ != "None":
+            wonderEmbed.add_field(
+                name='Civilization:', value=f'{thisWonder.civ} - {civEmojiIDs[civDict[thisWonder.civ]]}', inline=True
+            )
+        wonderEmbed.add_field(
+            name='Unlocked By:', value=f'{thisWonder.unlock}', inline=True
+        )
+
+
+        extractedID = extractEmojiID(wonderEmojiIDs[wonderDict[wonder]])
+        emojiUrl = f"https://cdn.discordapp.com/emojis/{extractedID}.png"
+        wonderEmbed.set_thumbnail(url=emojiUrl)
+        await ctx.send(embed = wonderEmbed)
+    else: 
+        await ctx.send(f"\"{wonder}\" isn't an option, use /wonderlist for a list of options (use exact formatting)")
 
 @bot.command(name="civlist", description="Lists all civs")
 async def civlist(ctx):
     output = "__Civ Options Are:__\n"
     for civ in antiquityCivs:
-        output += f"{civ} - {civEmojiIDs[civDict[civ]]}\n"
+        output += f"{replaceUnderscores(civ)} - {civEmojiIDs[civDict[civ]]}\n"
     output+="\n"
     for civ in explorationCivs:
-        output += f"{civ} - {civEmojiIDs[civDict[civ]]}\n"
+        output += f"{replaceUnderscores(civ)} - {civEmojiIDs[civDict[civ]]}\n"
     output+="\n"
     for civ in modernCivs:
-        output += f"{civ} - {civEmojiIDs[civDict[civ]]}\n"
+        output += f"{replaceUnderscores(civ)} - {civEmojiIDs[civDict[civ]]}\n"
     await ctx.send(output)
 
 
@@ -188,7 +225,7 @@ async def leaderlist(ctx):
 async def leaderinfo(ctx, leader):
     messageContent = ctx.message.content
     leader = replaceSpaces(extractLeader(messageContent))
-    print(messageContent)
+    leader = autoCapitalize(leader)
     if  replaceSpaces(leader) in allLeaders:
         leaderEmbed = discord.Embed(
             title = replaceUnderscores(leader),
@@ -216,6 +253,7 @@ async def maplist(ctx):
 async def mapinfo(ctx):
     messageContent = ctx.message.content
     map = replaceSpaces(extractMap(messageContent))
+    map = autoCapitalize(map)
     if map in allMaps:
         mapEmbed = discord.Embed(
             title = replaceUnderscores(map),
