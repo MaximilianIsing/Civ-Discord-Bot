@@ -556,7 +556,4 @@ async def vote(ctx):
         await ctx.send(f"Please only use this command inside a lobby hosting channel")
 
 
-
-
-
 bot.run(Token)
