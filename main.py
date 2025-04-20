@@ -7,7 +7,7 @@ import random
 from lists import *
 from helpers import *
 
-with open("TOKEN.txt", "r") as file:
+with open("storage/TOKEN.txt", "r") as file:
     content = file.read()
 
 Token = content
@@ -161,6 +161,7 @@ async def wonderinfo(ctx):
     messageContent = ctx.message.content
     wonder = replaceSpaces(extractWonder(messageContent))
     wonder = autoCapitalize(wonder)
+
     if  wonder in allWonderIDs:
         thisWonder = allWonders[wonderDict[wonder]]
 
@@ -184,7 +185,7 @@ async def wonderinfo(ctx):
         )
         if thisWonder.civ != "None":
             wonderEmbed.add_field(
-                name='Civilization:', value=f'{thisWonder.civ} - {civEmojiIDs[civDict[thisWonder.civ]]}', inline=True
+                name='Civilization:', value=f'{thisWonder.civ} - {civEmojiIDs[civDict[replaceSpaces(thisWonder.civ)]]}', inline=True
             )
         wonderEmbed.add_field(
             name='Unlocked By:', value=f'{thisWonder.unlock}', inline=True

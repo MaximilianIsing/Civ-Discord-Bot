@@ -130,16 +130,20 @@ def extractWonder(message):
     else:
         return "None"
 
+def capitalizeWord(word):
+    return word[0].upper() + word[1:].lower()
+
 def autoCapitalize(message):
-    exceptions = ["of", "a", "o","de"]
+    exceptions = ["Of", "A", "O","De"]
 
     words = message.split('_')
     result = []
     for word in words:
         if word:
-            if word in exceptions:
+            if capitalizeWord(word) in exceptions:
                 formatted_word = word.lower()
             else:
                 formatted_word = word[0].upper() + word[1:].lower()
             result.append(formatted_word)
     return '_'.join(result)
+
