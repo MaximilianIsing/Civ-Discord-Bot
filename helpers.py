@@ -109,14 +109,14 @@ def extractEmojiID(emoji):
     return match.group(1)
 
 def extractLeader(message):
-    match = re.search(r"^/leaderinfo\s+(.+)", message)
+    match = re.search(r"^/leaderInfo\s+(.+)", message)
     if match:
         return match.group(1)
     else:
         return "None"
     
 def extractMap(message):
-    match = re.search(r"^/mapinfo\s+(.+)", message)
+    match = re.search(r"^/mapInfo\s+(.+)", message)
     if match:
         return match.group(1)
     else:
@@ -124,7 +124,7 @@ def extractMap(message):
 
 
 def extractWonder(message):
-    match = re.search(r"^/wonderinfo\s+(.+)", message)
+    match = re.search(r"^/wonderInfo\s+(.+)", message)
     if match:
         return match.group(1)
     else:

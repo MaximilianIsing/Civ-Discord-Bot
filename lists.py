@@ -271,3 +271,19 @@ allWonders = antiquityWonders + explorationWonders + modernWonders
 allWonderIDs = [replaceSpaces(wonder.name) for wonder in allWonders]
 
 wonderDict = {wonder: index for index, wonder in enumerate(allWonderIDs)}
+
+
+class commandCorrection:
+    def __init__(self, input, correction):
+        self.input = input
+        self.correction = correction
+
+commanderCorrections = [
+    commandCorrection("mapinfo", "mapInfo"),
+    commandCorrection("maplist", "mapList"),
+    commandCorrection("wonderinfo", "wonderInfo"),
+    commandCorrection("wonderlist", "wonderList"),
+    commandCorrection("leaderlist", "leaderList"),
+    commandCorrection("leaderinfo", "leaderInfo"),
+    commandCorrection("civlist", "civList")
+]

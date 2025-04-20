@@ -4,8 +4,10 @@ from discord.ext import commands
 import time
 import asyncio
 import random
+import json
 from lists import *
 from helpers import *
+from storage_management import *
 
 with open("storage/TOKEN.txt", "r") as file:
     content = file.read()
@@ -90,7 +92,7 @@ async def on_ready():
     for i in range(len(allWonders)):
         wonderEmojiIDs[i] = f"<:{wonderEmojis[i].name}:{wonderEmojis[i].id}>"
 
-
+    initializeJSON()
     print("Bot Ready")
 
 
@@ -108,6 +110,13 @@ async def sync(ctx):
     else:
         await ctx.send("Insufficient permissions")
 
+@bot.command(name="dropPlayerData")
+async def dropplayerdata(ctx):
+    if ctx.author.id == OwnerID:
+        clearJSON()
+        await ctx.send("playerData.json file dropped")
+    else:
+        await ctx.send("Insufficient permissions")
 
 @bot.command(name="clear")
 async def clear(ctx):
@@ -123,8 +132,15 @@ async def status(ctx):
     await ctx.send("Status: Online")
  
 
-@bot.command(name="wonderlist", description="Lists all wonders")
-async def wonderlist(ctx):
+@bot.command(name="updateElo", description="Updates elo test")
+async def updateElo(ctx, key, num):
+    updateValue(key,num)
+    await ctx.send("Elo updated")
+
+
+
+@bot.command(name="wonderList", description="Lists all wonders")
+async def wonderList(ctx):
     antiquity = "__Wonder Options Are:__\n"
     
     i = 0
@@ -156,12 +172,14 @@ async def wonderlist(ctx):
         i += 1
     await ctx.send(modern)
 
-@bot.command(name="wonderinfo", description="ives information about the wonder")
-async def wonderinfo(ctx):
+@bot.command(name="wonderInfo", description="Gives information about the wonder")
+async def wonderInfo(ctx):
     messageContent = ctx.message.content
+    print(messageContent)
     wonder = replaceSpaces(extractWonder(messageContent))
+    print(wonder)
     wonder = autoCapitalize(wonder)
-
+    print(wonder)
     if  wonder in allWonderIDs:
         thisWonder = allWonders[wonderDict[wonder]]
 
@@ -197,10 +215,10 @@ async def wonderinfo(ctx):
         wonderEmbed.set_thumbnail(url=emojiUrl)
         await ctx.send(embed = wonderEmbed)
     else: 
-        await ctx.send(f"\"{wonder}\" isn't an option, use /wonderlist for a list of options (use exact formatting)")
+        await ctx.send(f"\"{wonder}\" isn't an option, use /wonderList for a list of options (use exact formatting)")
 
-@bot.command(name="civlist", description="Lists all civs")
-async def civlist(ctx):
+@bot.command(name="civList", description="Lists all civs")
+async def civList(ctx):
     output = "__Civ Options Are:__\n"
     for civ in antiquityCivs:
         output += f"{replaceUnderscores(civ)} - {civEmojiIDs[civDict[civ]]}\n"
@@ -213,7 +231,7 @@ async def civlist(ctx):
     await ctx.send(output)
 
 
-@bot.command(name="leaderlist", description="Lists all leaders")
+@bot.command(name="leaderList", description="Lists all leaders")
 async def leaderlist(ctx):
     output = "__Leader Options Are:__\n"
     for leader in allLeaders:
@@ -222,7 +240,7 @@ async def leaderlist(ctx):
 
 
 
-@bot.command(name="leaderinfo",description="Gives information about the leader")
+@bot.command(name="leaderInfo",description="Gives information about the leader")
 async def leaderinfo(ctx, leader):
     messageContent = ctx.message.content
     leader = replaceSpaces(extractLeader(messageContent))
@@ -238,10 +256,10 @@ async def leaderinfo(ctx, leader):
         leaderEmbed.set_thumbnail(url=emojiUrl)
         await ctx.send(embed = leaderEmbed)
     else: 
-        await ctx.send(f"\"{leader}\" isn't an option, use /leaderlist for a list of options (use exact formatting)")
+        await ctx.send(f"\"{leader}\" isn't an option, use /leaderList for a list of options (use exact formatting)")
 
 
-@bot.command(name="maplist", description="Lists all maps")
+@bot.command(name="mapList", description="Lists all maps")
 async def maplist(ctx):
     output = "__Map Options Are:__\n"
     for map in allMaps:
@@ -250,7 +268,7 @@ async def maplist(ctx):
 
 
 
-@bot.command(name="mapinfo",description="Gives information about the map type")
+@bot.command(name="mapInfo",description="Gives information about the map type")
 async def mapinfo(ctx):
     messageContent = ctx.message.content
     map = replaceSpaces(extractMap(messageContent))
@@ -265,9 +283,9 @@ async def mapinfo(ctx):
 
         await ctx.send(embed = mapEmbed)
     else: 
-        await ctx.send(f"\"{map}\" isn't an option, use /maplist for a list of options (use exact formatting)")
+        await ctx.send(f"\"{map}\" isn't an option, use /mapList for a list of options (use exact formatting)")
 
-@bot.command(name="reroll", description="Rerolls draft picks")
+@bot.command(name="reRoll", description="Rerolls draft picks")
 async def reroll(ctx):
     global gameHasOccured
     thisChannelID = ctx.channel.id
