@@ -278,12 +278,35 @@ class commandCorrection:
         self.input = input
         self.correction = correction
 
-commanderCorrections = [
+commandCorrections = [
     commandCorrection("mapinfo", "mapInfo"),
+    commandCorrection("MapInfo", "mapInfo"),
     commandCorrection("maplist", "mapList"),
+    commandCorrection("MapList", "mapList"),
     commandCorrection("wonderinfo", "wonderInfo"),
+    commandCorrection("WonderInfo", "wonderInfo"),
     commandCorrection("wonderlist", "wonderList"),
+    commandCorrection("WonderList", "wonderList"),
     commandCorrection("leaderlist", "leaderList"),
     commandCorrection("leaderinfo", "leaderInfo"),
-    commandCorrection("civlist", "civList")
+    commandCorrection("LeaderInfo", "leaderInfo"),
+    commandCorrection("civlist", "civList"),
+    commandCorrection("CivList", "civList"),
+    commandCorrection("reroll", "reRoll"),
+    commandCorrection("ReRoll", "reRoll"),
+    commandCorrection("cancelvote", "cancelVote"),
+    commandCorrection("CancelVote", "cancelVote"),
+    commandCorrection("clearvote", "cancelVote"),
+    commandCorrection("clearVote", "cancelVote"),
+    commandCorrection("ClearVote", "cancelVote"),
+    commandCorrection("bannedleaders", "bannedLeaders"),
+    commandCorrection("bannedLeaders", "bannedLeaders"),
+    commandCorrection("leaderBans", "bannedLeaders"),
+    commandCorrection("leaderbans", "bannedLeaders"),
+    commandCorrection("LeaderBans", "bannedLeaders")
+    
 ]
+
+correctedInputs = [command.input for command in commandCorrections]
+
+hardBannedLeaderIDs = [2,13]

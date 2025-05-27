@@ -5,6 +5,7 @@ import time
 import asyncio
 import random
 import json
+import re
 from lists import *
 from helpers import *
 from storage_management import *
@@ -18,7 +19,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 OwnerID = 424980696264867880
 
-bot = commands.Bot(command_prefix="/", intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 guildID = 1351787046720503808
 civGuildID = 1362491827478986752
@@ -36,6 +37,10 @@ voiceHostingChannels = {
     1351993272096260127: 1362542552376410252,
     1362542399905202300: 1351989426951295056
 }
+excludededUsers= { 
+    944016826751389717,
+    1351985363609976853
+}
 
 
 mostRecentCivOptions = {channel: [] for channel in lobbyHostingChannels}
@@ -44,6 +49,7 @@ mostRecentPlayers = {channel: [] for channel in lobbyHostingChannels}
 mustRecentNumLeaders = {channel: 0 for channel in lobbyHostingChannels}
 mostRecentNumCivs = {channel: 0 for channel in lobbyHostingChannels}
 gameHasOccured = {channel: False for channel in lobbyHostingChannels}
+voteIsActive = {channel: False for channel in lobbyHostingChannels}
 
 playerDraftMessagePointers = {channel: [] for channel in lobbyHostingChannels}
 
@@ -93,12 +99,35 @@ async def on_ready():
         wonderEmojiIDs[i] = f"<:{wonderEmojis[i].name}:{wonderEmojis[i].id}>"
 
     initializeJSON()
+
+    hostRole = discord.utils.get(thisGuild.roles, name="Host")
+    for channelID in lobbyHostingChannels:
+        channel = bot.get_channel(channelID)
+        if not channel:
+            channel = await bot.fetch_channel(channelID)  # fallback if not cached
+        await channel.set_permissions(hostRole, send_messages=True)
+
     print("Bot Ready")
 
 
 @bot.event
 async def on_message(message):
-    await bot.process_commands(message)
+    
+    correctionFound = -1
+    for correctionID in range(len(correctedInputs)):
+        if correctedInputs[correctionID] in message.content:
+            correctionFound = correctionID
+            break
+    
+    if correctionFound != -1:
+        newMessage = message
+        thisCorrection = commandCorrections[correctionFound]
+        newContent = (message.content).replace(thisCorrection.input,thisCorrection.correction)
+        newMessage.content = newContent
+        ctx = await bot.get_context(newMessage)
+        await bot.invoke(ctx)
+    else:
+        await bot.process_commands(message)
 
 
 @bot.command(name="sync")
@@ -175,11 +204,11 @@ async def wonderList(ctx):
 @bot.command(name="wonderInfo", description="Gives information about the wonder")
 async def wonderInfo(ctx):
     messageContent = ctx.message.content
-    print(messageContent)
+
     wonder = replaceSpaces(extractWonder(messageContent))
-    print(wonder)
+
     wonder = autoCapitalize(wonder)
-    print(wonder)
+
     if  wonder in allWonderIDs:
         thisWonder = allWonders[wonderDict[wonder]]
 
@@ -238,6 +267,25 @@ async def leaderlist(ctx):
         output += f"{replaceUnderscores(leader)} - {leaderEmojiIDs[leaderDict[leader]]}\n"
     await ctx.send(output)
 
+@bot.command(name="bannedLeaders", description="Lists all permabanned leaders")
+async def leaderlist(ctx):
+    output = "__Permabanned Leaders:__\n"
+    bannedLeaderNames = [allLeaders[i] for i in hardBannedLeaderIDs]
+    bannedLeaderEmojis = [leaderEmojiIDs[i] for i in hardBannedLeaderIDs]
+    output += formatOptions(bannedLeaderNames,bannedLeaderEmojis).replace("|","\n")
+    await ctx.send(output)
+
+
+
+@bot.command(name="cancelVote",description="Gives information about the leader")
+async def cancelVote(ctx):
+    thisChannelID = ctx.channel.id
+    if thisChannelID in lobbyHostingChannels:
+        voteIsActive[thisChannelID] = False
+        await ctx.channel.purge(limit=500)
+        await ctx.send(f"Vote cancelled")
+    else:
+        await ctx.send(f"Please only use this command inside a lobby hosting channel")
 
 
 @bot.command(name="leaderInfo",description="Gives information about the leader")
@@ -332,10 +380,27 @@ async def reroll(ctx):
 
 @bot.command(name="vote", description="Starts lobby vote")
 async def vote(ctx):
+    
     thisChannelID = ctx.channel.id
+    hostRoleID = discord.utils.get(ctx.guild.roles, name="Host")
+
     if thisChannelID in lobbyHostingChannels:  # In lobby_hosting channel
+        
+
+        if voteIsActive[thisChannelID]:
+            await ctx.send("A vote is already running in this channel")
+            return
+        else:
+            await ctx.channel.set_permissions(hostRoleID, send_messages=False)
+
+        voteIsActive[thisChannelID] = True
+
         voiceChannel = ctx.guild.get_channel(voiceHostingChannels[thisChannelID])
         playerIDs = [member.id for member in voiceChannel.members]
+
+        for excluded in excludededUsers:
+            if excluded in playerIDs:
+                playerIDs.remove(excluded)
 
         messageContent = ctx.message.content
         exceptionalPlayers = decipherIDs(messageContent)
@@ -349,6 +414,7 @@ async def vote(ctx):
             for player in exceptionalPlayers:
                 if player not in playerIDs:
                     playerIDs.append(player)
+        
 
 
         if len(playerIDs) == 0:
@@ -428,8 +494,14 @@ async def vote(ctx):
 
         remainingMessage = await ctx.send(output)
 
+        await ctx.channel.set_permissions(hostRoleID, send_messages=True)
+
         while not allFinished:
             await asyncio.sleep(doneVotingCheck)
+
+            if not voteIsActive[thisChannelID]:
+                
+                return
 
             hasChanged = False
 
@@ -453,7 +525,9 @@ async def vote(ctx):
                     await remainingMessage.delete()
                 else:
                     await remainingMessage.edit(content=output)
-        
+
+        await ctx.channel.set_permissions(hostRoleID, send_messages=False)
+
         await finishedMessage.clear_reactions()
         await finishedMessage.edit(content = "Vote Finished: Please Wait")
 
@@ -512,6 +586,9 @@ async def vote(ctx):
             await ctx.send("No Civ Bans")
 
         bannedLeaders = getPick(leaderReactions,5,True)
+        
+        for ID in hardBannedLeaderIDs:
+            bannedLeaders.append(ID)
         if len(bannedLeaders) > 0:
             bannedLeaderNames = [allLeaders[i] for i in bannedLeaders]
             bannedLeaderEmojis = [leaderEmojiIDs[i] for i in bannedLeaders]
@@ -552,7 +629,7 @@ async def vote(ctx):
         mostRecentCivOptions[thisChannelID] = postBanCivs.copy()
         mostRecentLeaderOptions[thisChannelID] = postBanLeaders.copy()
         mostRecentPlayers[thisChannelID] = playerIDs.copy()
-        mustRecentNumLeaders[thisChannelID] = leaderOptions
+        mustRecentNumLeaders[thisChannelID] = leaderOptions 
         mostRecentNumCivs[thisChannelID] = civOptions
         playerDraftMessagePointers[thisChannelID].clear()
 
@@ -571,8 +648,11 @@ async def vote(ctx):
 
             thisMessage = await ctx.send(output + "\n")
             playerDraftMessagePointers[thisChannelID].append(thisMessage)
+        voteIsActive[thisChannelID] = False
+        await ctx.channel.set_permissions(hostRoleID, send_messages=True)
     else:
         await ctx.send(f"Please only use this command inside a lobby hosting channel")
+    
 
 
 bot.run(Token)

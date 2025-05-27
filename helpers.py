@@ -1,5 +1,8 @@
 import re
 import random
+
+commandPrefix = "!"
+
 def replaceUnderscores(input):
     return input.replace("_", " ")
 def replaceSpaces(input):
@@ -109,14 +112,14 @@ def extractEmojiID(emoji):
     return match.group(1)
 
 def extractLeader(message):
-    match = re.search(r"^/leaderInfo\s+(.+)", message)
+    match = re.search(rf"^{commandPrefix}leaderInfo\s+(.+)", message)
     if match:
         return match.group(1)
     else:
         return "None"
     
 def extractMap(message):
-    match = re.search(r"^/mapInfo\s+(.+)", message)
+    match = re.search(rf"^{commandPrefix}mapInfo\s+(.+)", message)
     if match:
         return match.group(1)
     else:
@@ -124,7 +127,7 @@ def extractMap(message):
 
 
 def extractWonder(message):
-    match = re.search(r"^/wonderInfo\s+(.+)", message)
+    match = re.search(rf"^{commandPrefix}wonderInfo\s+(.+)", message)
     if match:
         return match.group(1)
     else:
