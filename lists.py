@@ -294,6 +294,8 @@ commandCorrections = [
     commandCorrection("CivList", "civList"),
     commandCorrection("reroll", "reRoll"),
     commandCorrection("ReRoll", "reRoll"),
+    commandCorrection("revote", "reRoll"),
+    commandCorrection("reVote", "reRoll"),
     commandCorrection("cancelvote", "cancelVote"),
     commandCorrection("CancelVote", "cancelVote"),
     commandCorrection("clearvote", "cancelVote"),
@@ -301,6 +303,8 @@ commandCorrections = [
     commandCorrection("ClearVote", "cancelVote"),
     commandCorrection("bannedleaders", "bannedLeaders"),
     commandCorrection("bannedLeaders", "bannedLeaders"),
+    commandCorrection("permabanned", "bannedLeaders"),
+    commandCorrection("permaBanned", "bannedLeaders"),
     commandCorrection("leaderBans", "bannedLeaders"),
     commandCorrection("leaderbans", "bannedLeaders"),
     commandCorrection("LeaderBans", "bannedLeaders")
@@ -309,4 +313,4 @@ commandCorrections = [
 
 correctedInputs = [command.input for command in commandCorrections]
 
-hardBannedLeaderIDs = [2,13]
+hardBannedLeaderIDs = [2,11,13]

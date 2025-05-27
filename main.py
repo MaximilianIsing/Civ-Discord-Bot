@@ -269,7 +269,7 @@ async def leaderlist(ctx):
 
 @bot.command(name="bannedLeaders", description="Lists all permabanned leaders")
 async def leaderlist(ctx):
-    output = "__Permabanned Leaders:__\n"
+    output = "__Permabanned Leaders:__\n "
     bannedLeaderNames = [allLeaders[i] for i in hardBannedLeaderIDs]
     bannedLeaderEmojis = [leaderEmojiIDs[i] for i in hardBannedLeaderIDs]
     output += formatOptions(bannedLeaderNames,bannedLeaderEmojis).replace("|","\n")
