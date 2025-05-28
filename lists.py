@@ -144,6 +144,7 @@ allMaps = [
         "Fractal",
         "Shuffle",
         "Terra_Incognita",
+        "Pangeaea_Plus"
     ]
 
 mapInfoList = {
@@ -174,7 +175,7 @@ mapFavoring = {
 
 }
 
-mapEmojis = ["🇨", "🇵", "🇦", "🇫", "🇸", "🇹"]
+mapEmojis = ["🇨", "🇺", "🇦", "🇫", "🇸", "🇹","🇵"]
 
 
 allStartOptions = [
@@ -192,9 +193,24 @@ crisisOptions =  [
 
 crisisEmojis = ["✅", "🚫"]
 
+turnTimerOptions = [
+        "Disabled",
+        "Stanard",
+        "Dynamic"
+    ]
 
-numLeaderOptions = ["1️⃣", "2️⃣", "3️⃣", "4️⃣"]
+turnTimerEmojis = [
+        "❌",
+        "⏰",
+        "⏱️"
+    ]
 
+
+
+
+numLeaderOptions = ["1️⃣", "2️⃣", "3️⃣", "4️⃣","5️⃣","6️⃣","6️⃣","8️⃣"]
+
+maxNumLeaderOptions = len(numLeaderOptions)
 
 numCivOptions =  ["1️⃣", "2️⃣"]
 
@@ -303,6 +319,7 @@ commandCorrections = [
     commandCorrection("ClearVote", "cancelVote"),
     commandCorrection("bannedleaders", "bannedLeaders"),
     commandCorrection("bannedLeaders", "bannedLeaders"),
+    commandCorrection("BannedLeaders", "bannedLeaders"),
     commandCorrection("permabanned", "bannedLeaders"),
     commandCorrection("permaBanned", "bannedLeaders"),
     commandCorrection("leaderBans", "bannedLeaders"),
@@ -314,3 +331,23 @@ commandCorrections = [
 correctedInputs = [command.input for command in commandCorrections]
 
 hardBannedLeaderIDs = [2,11,13]
+
+lobbyHostingChannels = [1351993272096260127, 1362542399905202300]
+voiceHostingChannels = {
+    1351993272096260127: 1362542552376410252,
+    1362542399905202300: 1351989426951295056
+}
+excludededUsers= { 
+    #944016826751389717,
+    #1351985363609976853
+}
+
+guildID = 1351787046720503808
+civGuildID = 1362491827478986752
+wonderGuildID = 1362574955375493291
+
+OwnerID = 424980696264867880
+
+doneVotingCheck = 2 # Num of seconds between checks
+
+maxReactionsPerMessage = 20

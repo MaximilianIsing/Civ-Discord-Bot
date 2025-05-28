@@ -9,6 +9,7 @@ import re
 from lists import *
 from helpers import *
 from storage_management import *
+import math
 
 with open("storage/TOKEN.txt", "r") as file:
     content = file.read()
@@ -17,30 +18,17 @@ Token = content
 
 intents = discord.Intents.default()
 intents.message_content = True
-OwnerID = 424980696264867880
+
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-guildID = 1351787046720503808
-civGuildID = 1362491827478986752
-wonderGuildID = 1362574955375493291
+
 
 thisGuild = None
 civGuild = None
 wonderGuild = None
 
 
-doneVotingCheck = 2 # Num of seconds between checks
-
-lobbyHostingChannels = [1351993272096260127, 1362542399905202300]
-voiceHostingChannels = {
-    1351993272096260127: 1362542552376410252,
-    1362542399905202300: 1351989426951295056
-}
-excludededUsers= { 
-    944016826751389717,
-    1351985363609976853
-}
 
 
 mostRecentCivOptions = {channel: [] for channel in lobbyHostingChannels}
@@ -386,17 +374,17 @@ async def vote(ctx):
 
     if thisChannelID in lobbyHostingChannels:  # In lobby_hosting channel
         
-
         if voteIsActive[thisChannelID]:
             await ctx.send("A vote is already running in this channel")
             return
         else:
             await ctx.channel.set_permissions(hostRoleID, send_messages=False)
 
-        voteIsActive[thisChannelID] = True
-
         voiceChannel = ctx.guild.get_channel(voiceHostingChannels[thisChannelID])
         playerIDs = [member.id for member in voiceChannel.members]
+        
+
+        
 
         for excluded in excludededUsers:
             if excluded in playerIDs:
@@ -415,8 +403,6 @@ async def vote(ctx):
                 if player not in playerIDs:
                     playerIDs.append(player)
         
-
-
         if len(playerIDs) == 0:
             await ctx.send(f"<#{voiceHostingChannels[thisChannelID]}> is empty")
             return
@@ -425,6 +411,14 @@ async def vote(ctx):
                 f"<#{voiceHostingChannels[thisChannelID]}> has an insufficient amount of players (2 minimum)"
             )
             return
+
+        voteIsActive[thisChannelID] = True
+        
+
+        thisMaxLeaderOptions = math.floor(
+            (len(allLeaders) - len(hardBannedLeaderIDs))/len(playerIDs)
+        )
+        thisMaxLeaderOptions = min(thisMaxLeaderOptions,maxNumLeaderOptions)
 
         await ctx.channel.purge(limit=500)
 
@@ -456,6 +450,10 @@ async def vote(ctx):
         crisisMessage = await ctx.send("Crisis: " + formatOptions(crisisOptions,crisisEmojis))
         for reaction in crisisEmojis:
             await crisisMessage.add_reaction(reaction)
+        
+        turnTimerMessage = await ctx.send("Turn Timer: " + formatOptions(turnTimerOptions,turnTimerEmojis))
+        for reaction in turnTimerEmojis:
+            await turnTimerMessage.add_reaction(reaction)
 
         civMessage = await ctx.send("Civ Bans: (3 bans max)")
         for civ in antiquityCivs:
@@ -463,18 +461,36 @@ async def vote(ctx):
             await civMessage.add_reaction(reaction)
 
         # Leader Bans
-        firstLeaderMessage = await ctx.send("Leader Bans: (5 bans max)")
-        for r in range(20):
-            await firstLeaderMessage.add_reaction(leaderEmojis[r])
 
-        secondLeaderMessage = await ctx.send("** **")
-        for r in range(20, len(allLeaders)):
-            await secondLeaderMessage.add_reaction(leaderEmojis[r])
+        leaderMessages = []
+
+        firstLeaderMessage = await ctx.send("Leader Bans: (5 bans max)")
+        leaderMessages.append(firstLeaderMessage)
+
+        counter = 0
+        banCounter = 0
+
+        currentMessage = 0
+
+        
+        while counter < len(allLeaders):
+            if counter in hardBannedLeaderIDs:
+                counter += 1
+                continue
+            if counter - banCounter % 20 == 0 and counter - banCounter != 0:
+                currentMessage += 1
+                newMessage = await ctx.send("** **")
+                leaderMessages.append(newMessage)
+            await leaderMessages[currentMessage].add_reaction(leaderEmojis[counter])
+            counter += 1
+
+
+
 
         # Num Leader Options
         numLeaderMessage = await ctx.send("Number of Leader Options per Player:")
-        for reaction in numLeaderOptions:
-            await numLeaderMessage.add_reaction(reaction)
+        for reactionIndex in range(thisMaxLeaderOptions):
+            await numLeaderMessage.add_reaction(numLeaderOptions[reactionIndex])
 
         # Num Civ Options
         if len(playerIDs) <= 4:
@@ -533,22 +549,30 @@ async def vote(ctx):
 
         start = time.time()
 
+        leaderMessageIDs = [message.id for message in leaderMessages]
+
         messageIDs = [
             mapMessage.id,
             startTypeMessage.id,
             crisisMessage.id,
+            turnTimerMessage.id,
             civMessage.id,
             numLeaderMessage.id,
-            firstLeaderMessage.id,
-            secondLeaderMessage.id
         ]
+        messageIDs.extend(leaderMessageIDs)
 
         allReactions = await fetchAndFormatReactions(ctx,messageIDs,playerIDs)
 
-        mapReactions, startReactions, crisisReactions, civReactions, numLeaderReactions, firstLeaderReactions, secondLeaderReactions = allReactions
+        mapReactions = allReactions[0]
+        startReactions = allReactions[1]
+        crisisReactions = allReactions[2]
+        turnTimerReactions = allReactions[3]
+        civReactions = allReactions[4]
+        numLeaderReactions = allReactions[5]
+        leaderReactions = allReactions[6:]
+        leaderReactions  = [item for sublist in leaderReactions for item in sublist]
 
-        leaderReactions = firstLeaderReactions + secondLeaderReactions
-        
+
         end = time.time()
 
         await finishedMessage.edit(content = f"Vote Finished: Loading Took {end - start:.2f} Seconds")
@@ -576,6 +600,15 @@ async def vote(ctx):
             await ctx.send("Crisis Disabled - 🚫")
         else:
             await ctx.send("Crisis Enabled - ✅")
+        
+        turnTimerOption = getPick(turnTimerReactions,1,False)
+
+        if turnTimerOption == 0:
+            await ctx.send("Turn Timer Disabled - 🚫")
+        elif turnTimerOption == 1:
+            await ctx.send("Standard Turn Timer - ⏰")
+        else:
+            await ctx.send("Dynamic Turn Timer - ⏱️")
 
         bannedCivs = getPick(civReactions,3,True)
         if len(bannedCivs) > 0:
@@ -585,10 +618,14 @@ async def vote(ctx):
         else:
             await ctx.send("No Civ Bans")
 
+        for ID in hardBannedLeaderIDs:
+            leaderReactions.insert(ID,1)
+
         bannedLeaders = getPick(leaderReactions,5,True)
-        
+
         for ID in hardBannedLeaderIDs:
             bannedLeaders.append(ID)
+
         if len(bannedLeaders) > 0:
             bannedLeaderNames = [allLeaders[i] for i in bannedLeaders]
             bannedLeaderEmojis = [leaderEmojiIDs[i] for i in bannedLeaders]

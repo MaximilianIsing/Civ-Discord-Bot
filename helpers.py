@@ -5,6 +5,7 @@ commandPrefix = "!"
 
 def replaceUnderscores(input):
     return input.replace("_", " ")
+
 def replaceSpaces(input):
     return input.replace(" ", "_") 
 
