@@ -476,8 +476,9 @@ async def vote(ctx):
         while counter < len(allLeaders):
             if counter in hardBannedLeaderIDs:
                 counter += 1
+                banCounter += 1
                 continue
-            if counter - banCounter % 20 == 0 and counter - banCounter != 0:
+            if (counter - banCounter) % 20 == 0 and (counter - banCounter) != 0:
                 currentMessage += 1
                 newMessage = await ctx.send("** **")
                 leaderMessages.append(newMessage)
