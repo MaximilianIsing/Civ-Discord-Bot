@@ -602,10 +602,10 @@ async def vote(ctx):
         else:
             await ctx.send("Crisis Enabled - ✅")
         
-        turnTimerOption = getPick(turnTimerReactions,1,False)
+        turnTimerOption = getPick(turnTimerReactions,1,False)[0]
 
         if turnTimerOption == 0:
-            await ctx.send("Turn Timer Disabled - 🚫")
+            await ctx.send("Turn Timer Disabled - ❌")
         elif turnTimerOption == 1:
             await ctx.send("Standard Turn Timer - ⏰")
         else:
