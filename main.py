@@ -11,7 +11,7 @@ from helpers import *
 from storage_management import *
 import math
 
-with open("storage/TOKEN.txt", "r") as file:
+with open("TOKEN.txt", "r") as file:
     content = file.read()
 
 Token = content
