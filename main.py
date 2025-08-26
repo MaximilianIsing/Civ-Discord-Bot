@@ -414,7 +414,7 @@ async def vote(ctx):
         if len(playerIDs) == 0:
             await ctx.send(f"<#{voiceHostingChannels[thisChannelID]}> is empty")
             return
-        if len(playerIDs) == 0: # To do: return to this
+        if len(playerIDs) == 1:
             await ctx.send(
                 f"<#{voiceHostingChannels[thisChannelID]}> has an insufficient amount of players (2 minimum)"
             )
