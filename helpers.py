@@ -4,12 +4,15 @@ import random
 commandPrefix = "!"
 
 def replaceUnderscores(input):
+    """Replace underscores with spaces"""
     return input.replace("_", " ")
 
 def replaceSpaces(input):
+    """Replace spaces with underscores"""
     return input.replace(" ", "_") 
 
 def formatOptions(names, emojis):
+    """Format names and emojis into a readable options string"""
     output = ""
     for i in range(len(names)):
         output += emojis[i]
@@ -50,6 +53,7 @@ async def fetchAndFormatReactions(ctx, messageIDs, playerIDs):
     return reactions
 
 def getNLargest(countsList, n):
+    """Optimized function to find n largest values with their indices"""
     if len(countsList) <= n:
         return [[i] for i in range(len(countsList))]
 
@@ -89,11 +93,8 @@ def getPick(countList, n, nonePossible):
         random.shuffle(picked[i])
     picked = flattenList(picked)
     if nonePossible:
-        options = []
-        for i in picked:
-            if countList[i] != 0:
-                options.append(i)
-        picked = options
+        # Filter out zero counts
+        picked = [i for i in picked if countList[i] != 0]
 
     if len(picked) > n:
         return picked[:n]
@@ -102,39 +103,34 @@ def getPick(countList, n, nonePossible):
     
 
 def decipherIDs(message):
+    """Extract user IDs from Discord mention format"""
     IDs = re.findall(r"<@(\d+)>", message)
-    IDs = [int(uid) for uid in IDs]
-
-    return IDs
+    return [int(uid) for uid in IDs]
 
 
 def extractEmojiID(emoji):
+    """Extract emoji ID from Discord emoji format"""
     match = re.search(r"<:[A-Za-z_]+:(\d+)>", emoji)
-    return match.group(1)
+    return match.group(1) if match else None
 
 def extractLeader(message):
+    """Extract leader name from leader info command"""
     match = re.search(rf"^{commandPrefix}leaderInfo\s+(.+)", message)
-    if match:
-        return match.group(1)
-    else:
-        return "None"
+    return match.group(1) if match else "None"
     
 def extractMap(message):
+    """Extract map name from map info command"""
     match = re.search(rf"^{commandPrefix}mapInfo\s+(.+)", message)
-    if match:
-        return match.group(1)
-    else:
-        return "None"
+    return match.group(1) if match else "None"
 
 
 def extractWonder(message):
+    """Extract wonder name from wonder info command"""
     match = re.search(rf"^{commandPrefix}wonderInfo\s+(.+)", message)
-    if match:
-        return match.group(1)
-    else:
-        return "None"
+    return match.group(1) if match else "None"
 
 def capitalizeWord(word):
+    """Capitalize first letter and lowercase the rest"""
     return word[0].upper() + word[1:].lower()
 
 def autoCapitalize(message):
